@@ -1,3 +1,5 @@
+const fs = require("fs")
+
 exports.success = (req, res, status = 200, message = '') => {
     res.status(status).send({
         error: false,
@@ -12,4 +14,14 @@ exports.error = (req, res, status = 500, message = 'Error interno') => {
         status: status,
         body: message
     })
+}
+
+exports.file = (req, res, filePath, contentType, filenameDownload) => {
+    console.log(`filePath`, filePath)
+    var file = fs.createReadStream(filePath)
+    var stat = fs.statSync(filePath)
+    res.setHeader('Content-Length', stat.size)
+    res.setHeader('Content-Type', contentType)
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filenameDownload)
+    file.pipe(res)
 }

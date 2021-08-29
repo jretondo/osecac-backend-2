@@ -28,9 +28,29 @@ const cantExtractos = (desde, hasta) => {
     }
 }
 
+const saldoInicial = (desde) => {
+    return ` SELECT sum(monto) AS saldoIni, MAX(fecha) AS fechaAnt FROM extractos_bco_cba WHERE fecha < '${desde}' `
+}
+
+const movimientosBco = (desde, hasta) => {
+    return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+}
+
+const totalGastos = (desde, hasta) => {
+    return ` SELECT SUM(monto) AS gastos FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = 7 `
+}
+
+const totalImpuestos = (desde, hasta) => {
+    return ` SELECT SUM(monto) AS impuestos FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND (id_tipo = 8 OR id_tipo = 9) `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
     listExtractos,
-    cantExtractos
+    cantExtractos,
+    saldoInicial,
+    movimientosBco,
+    totalGastos,
+    totalImpuestos
 }

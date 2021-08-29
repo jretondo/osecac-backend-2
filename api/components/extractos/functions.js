@@ -1,5 +1,9 @@
 const XLSX = require("xlsx")
 const formatDate = require('../../../utils/FormatDate')
+const formatMoney = require('../../../utils/NumberFormat')
+const ejs = require("ejs")
+const pdf = require("html-pdf")
+const path = require('path')
 
 const getDataSheet = (fileUrl) => {
     const workBook = XLSX.readFile(fileUrl)
@@ -46,8 +50,69 @@ const transformToMoney = (rawNumber) => {
     return valor
 }
 
+const listaMovExtracto = async (rawList, saldoInicial) => {
+    return new Promise((resolve, reject) => {
+        listaItems = []
+        let saldoGral = saldoInicial
+        rawList.map(item => {
+            const fecha = formatDate(item.fecha, "dd/mm/yyyy")
+            const comprobante = item.nro_cbte
+            const descripcion = item.concepto
+            const descripcion2 = item.descripcion
+            const tipo = item.id_tipo
+            const monto = formatMoney(item.monto)
+            saldoGral = parseFloat(saldoGral) + parseFloat(item.monto)
+            const saldo = formatMoney(saldoGral)
+
+            listaItems.push({
+                fecha,
+                comprobante,
+                descripcion,
+                descripcion2,
+                tipo,
+                monto,
+                saldo
+            })
+        })
+        resolve(listaItems)
+    })
+}
+
+const renderReport = async (datos, desde, hasta, next) => {
+    return new Promise((resolve, reject) => {
+        ejs.renderFile(path.join("reports", "ejs", "Extracto", "index.ejs"), datos, (err, data) => {
+            const options = {
+                "height": "18in",
+                "width": "12in",
+                "border": {
+                    "right": "0.5cm",
+                    "left": "0.5cm",
+                    "top": "1.5cm"
+                },
+                paginationOffset: 1,
+                "footer": {
+                    "height": "28mm",
+                    "contents": {
+                        default: '<h3 style="text-align: center">Página <span style="color: #444;">{{page}}</span> de <span>{{pages}}</span></h3>'
+                    }
+                },
+            };
+
+            pdf.create(data, options).toFile(path.join("Archivos", "Extractos-PDF", "Extracto " + desde + " al " + hasta + ".pdf"), async function (err, data) {
+                if (err) {
+                    next()
+                } else {
+                    resolve(path.join("Archivos", "Extractos-PDF", "Extracto " + desde + " al " + hasta + ".pdf"))
+                }
+            })
+        })
+    })
+}
+
 module.exports = {
     getDataSheet,
     transformToDate,
-    transformToMoney
+    transformToMoney,
+    listaMovExtracto,
+    renderReport
 }
