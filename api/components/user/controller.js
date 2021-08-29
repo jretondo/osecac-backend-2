@@ -1,5 +1,5 @@
 const TABLA = 'users'
-const TABLA2 = 'user_follow'
+const err = require('../../../utils/error')
 const auth = require('../auth')
 
 module.exports = (injectedStore) => {
@@ -18,7 +18,8 @@ module.exports = (injectedStore) => {
     const upsert = async (body) => {
         const user = {
             name: body.name,
-            username: body.username
+            username: body.username,
+            email: body.email
         }
 
         if (body.id) {
@@ -32,36 +33,23 @@ module.exports = (injectedStore) => {
             user.id = body.id
             return store.update(TABLA, user)
         } else {
-            const result = await store.insert(TABLA, user)
             if (body.password || body.username) {
+                const result = await store.insert(TABLA, user)
                 await auth.upsert({
                     id: result.insertId,
                     username: user.username,
                     password: body.password
                 }, true)
+                return result
+            } else {
+                throw err("Faltan las credenciales!", 500)
             }
-            return result
         }
     }
 
-    const follow = async (from, to) => {
-        return await store.insert(TABLA2, {
-            user_from: from,
-            user_to: to
-        })
-    }
-
-    const following = async (id) => {
-        const join = {}
-        join[TABLA] = "user_to"
-        const query = { user_from: id }
-        return await store.query(TABLA2, query, join)
-    }
     return {
         list,
         get,
-        upsert,
-        follow,
-        following
+        upsert
     }
 }

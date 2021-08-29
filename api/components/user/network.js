@@ -29,28 +29,10 @@ const upsert = (req, res, next) => {
         .catch(next)
 }
 
-const follow = (req, res, next) => {
-    Controller.follow(req.user.id, req.params.id)
-        .then(() => {
-            response.success(req, res, 201, "Seguido correctamente")
-        })
-        .catch(next)
-}
-
-const following = (req, res, next) => {
-    Controller.following(req.user.id)
-        .then((data) => {
-            response.success(req, res, 200, data)
-        })
-        .catch(next)
-}
-
 //Routes
-router.get("/", list)
-router.get("/get/:id", get)
-router.get("/following", secure("follow"), following)
-router.post("/follow/:id", secure("follow"), follow)
-router.post("/", upsert)
-router.put("/", secure('update'), upsert)
+router.get("/", secure(1), list)
+router.get("/get/:id", secure(1), get)
+router.post("/", secure(1), upsert)
+router.put("/", secure(1), upsert)
 
 module.exports = router

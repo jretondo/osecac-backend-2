@@ -1,4 +1,5 @@
 const auth = require('../../../auth')
+
 module.exports = checkAuth = (idPermission) => {
 
     const middleware = async (req, res, next) => {

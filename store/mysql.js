@@ -36,7 +36,7 @@ const handleCon = () => {
 
 handleCon()
 
-const list = (table, id) => {
+const list = (table) => {
     return new Promise((resolve, reject) => {
         connection.query(` SELECT * FROM ${table} `, (err, data) => {
             if (err) {
@@ -72,6 +72,19 @@ const insert = (table, data) => {
     })
 }
 
+const remove = (table, data) => {
+
+    return new Promise((resolve, reject) => {
+        connection.query(` DELETE FROM ${table} WHERE ? `, [data], (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+
 const update = (table, data) => {
     return new Promise((resolve, reject) => {
         let { id, ...datos2 } = data
@@ -86,7 +99,6 @@ const update = (table, data) => {
 }
 
 const query = (table, query, join) => {
-    console.log(`join`, join)
     let joinQuery = '';
     if (join) {
         const key = Object.keys(join)[0];
@@ -97,15 +109,27 @@ const query = (table, query, join) => {
     return new Promise((resolve, reject) => {
         connection.query(` SELECT * FROM ${table} ${joinQuery} WHERE ${table}.? `, query, (err, res) => {
             if (err) return reject(err);
-            resolve(res[0] || null);
+            resolve(res || null);
         })
     })
 }
+
+const customQuery = (query, data) => {
+    return new Promise((resolve, reject) => {
+        connection.query(query, data, (err, res) => {
+            if (err) return reject(err);
+            resolve(res || null);
+        })
+    })
+}
+
 
 module.exports = {
     list,
     get,
     insert,
     update,
-    query
+    query,
+    remove,
+    customQuery
 }

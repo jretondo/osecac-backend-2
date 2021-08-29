@@ -1,6 +1,7 @@
 const auth = require('../../../auth')
 const bcrypt = require('bcrypt')
 const TABLA = 'auth'
+const TABLA2 = 'users'
 
 module.exports = (injectedStore) => {
     let store = injectedStore
@@ -9,6 +10,7 @@ module.exports = (injectedStore) => {
     }
 
     const upsert = async (data, isNew) => {
+        console.log(`data`, data)
         const authData = {
             id: data.id
         }
@@ -20,20 +22,29 @@ module.exports = (injectedStore) => {
         if (data.password) {
             authData.password = await bcrypt.hash(data.password, 5)
         }
+
         if (isNew) {
+            authData.prov = "1"
             store.insert(TABLA, authData)
         } else {
+            authData.prov = "0"
             store.update(TABLA, authData)
         }
     }
 
     const login = async (username, password) => {
         const data = await store.query(TABLA, { username: username })
-        console.log(`data`, data)
-        return bcrypt.compare(password, data.password)
+        const idUser = data[0].id
+        const prov = data[0].prov
+        const userData = await store.get(TABLA2, idUser)
+        return bcrypt.compare(password, data[0].password)
             .then(same => {
                 if (same) {
-                    return auth.sign(JSON.stringify(data))
+                    return {
+                        token: auth.sign(JSON.stringify(data[0])),
+                        userData: userData[0],
+                        provisory: prov
+                    }
                 } else {
                     throw new Error('información invalida')
                 }

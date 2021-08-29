@@ -1,15 +1,15 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Esta es una aplicación generada a través del curso de NodeJS práctico de Platzi.",
-        "version": "1.0.0",
-        "title": "Social Network Platzi"
+        "description": "Aplicación Backend para el área contable de Osecac Delegación Córdoba",
+        "version": "2.3.0",
+        "title": "Contability App - Osecac Córdoba"
     },
-    "host": "192.168.0.11",
+    "host": "172.21.10.25",
     "basePath": "/api",
     "tags": [
         {
-            "name": "user",
+            "name": "users",
             "description": "Operaciones sobre usuario"
         }
     ],
@@ -20,24 +20,46 @@
         "/user": {
             "get": {
                 "tags": [
-                    "user"
+                    "users"
                 ],
-                "summary": "Lista de usuarios",
-                "description": "Trae una lista completa de todos los usuarios",
-                "operationId": "listUser",
+                "summary": "Obtiene el listado de los usuarios",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
-                    "default": {
-                        "description": "successful operation"
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/UserList"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
-                    "user"
+                    "users"
                 ],
-                "summary": "crea un usuario",
-                "description": "crea un usuario en nuestra app",
+                "summary": "Crea un nuevo usuario",
+                "description": "",
                 "operationId": "createUser",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -45,51 +67,740 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "Usuario creado",
+                        "description": "Datos del usuario",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/User"
+                            "$ref": "#/definitions/UserCreate"
                         }
                     }
                 ],
                 "responses": {
-                    "default": {
-                        "description": "successful operation"
+                    "201": {
+                        "description": "User Created"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Modifica un usuario",
+                "description": "",
+                "operationId": "updateUser",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Datos del usuario a modificar (con el id)",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User Update"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/user/{userId}": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Obtiene datos de un usuario en particular",
+                "description": "",
+                "operationId": "getUser",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID del usuario a consultar",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/UserList"
+                        }
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Borra un usuario",
+                "description": "",
+                "operationId": "deletePet",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "Id del usuario a borrar",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario borrado correctamente"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/permissions": {
+            "post": {
+                "tags": [
+                    "permissions"
+                ],
+                "summary": "Crea los permisos para el usuario",
+                "description": "",
+                "operationId": "createPermissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Permisos del usuario",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Permissions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Permissions Created"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "permissions"
+                ],
+                "summary": "Modifica los permisos del usuario",
+                "description": "",
+                "operationId": "updatePermissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Permisos del usuario",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Permissions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Permissions Update"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Crea los permisos para el usuario",
+                "description": "",
+                "operationId": "loginUser",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Permisos del usuario",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Permissions Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/LoginRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
                     }
                 }
+            }
+        },
+        "/auth/changePass": {
+            "put": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Modifica la contraseña del usuario",
+                "description": "",
+                "operationId": "passupdate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Permisos del usuario",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Pass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Contraseña cambiada con éxito"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/adminUsu": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de usuarios",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/libroBanco": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración del libro banco",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/extractosbancarios": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de los extractos bancarios",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/pagoProveedores": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de los proveedores y sus pagos",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/pagoAgencias": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de las agencias y sus pagos",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/pagoPrestadores": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de las prestadores y sus pagos",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/conciliacionBancaria": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de la conciliación bancaria",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/rendicionesCoseguro": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración de las rendiciones de coseguro",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/fiscalizacion": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permiso para administración del trabajo de fiscalización",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/dashboard": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permisos a la aplicación para ingresar (cualquier usuario puede entrar)",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/routes/changePass": {
+            "get": {
+                "tags": [
+                    "routes"
+                ],
+                "summary": "Pide permisos a la aplicación para ingresar a cambiar la contraseña",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permiso concedido"
+                    },
+                    "401": {
+                        "description": "No tiene los permisos"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
             }
         }
     },
     "securityDefinitions": {
-        "petstore_auth": {
-            "type": "oauth2",
-            "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
-            "flow": "implicit",
-            "scopes": {
-                "write:pets": "modify pets in your account",
-                "read:pets": "read your pets"
-            }
-        },
         "api_key": {
             "type": "apiKey",
-            "name": "api_key",
+            "name": "Baerer Token",
             "in": "header"
         }
     },
     "definitions": {
-        "User": {
+        "UserList": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserCreate": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "username": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
-                "userStatus": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserUpdate": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "Permissions": {
+            "type": "object",
+            "properties": {
+                "idUser": {
                     "type": "integer",
-                    "format": "int32",
-                    "description": "User Status"
+                    "format": "int64"
+                },
+                "category": {
+                    "$ref": "#/definitions/Permisos"
+                }
+            }
+        },
+        "Permisos": {
+            "type": "object",
+            "properties": {
+                "idPermiso": {
+                    "type": "integer"
+                }
+            }
+        },
+        "Login": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "LoginRes": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "userData": {
+                    "$ref": "#/definitions/UserList"
+                }
+            }
+        },
+        "Pass": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
                 }
             }
         }

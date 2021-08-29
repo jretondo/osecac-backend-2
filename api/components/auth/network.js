@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const response = require("../../../network/response")
 const Controller = require("./index")
+const secure = require('./secure')
 
 //internal Functions
 const login = (req, res, next) => {
@@ -12,7 +13,19 @@ const login = (req, res, next) => {
         .catch(next)
 }
 
+const changePass = (req, res, next) => {
+    Controller.upsert({
+        id: req.user.id,
+        password: req.body.password
+    }, false)
+        .then(data => {
+            response.success(req, res, 200, data)
+        })
+        .catch(next)
+}
+
 //Routes
 router.post("/login", login)
+router.put("/changePass", secure(1), changePass)
 
 module.exports = router
