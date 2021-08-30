@@ -10,7 +10,6 @@ module.exports = (injectedStore) => {
     }
 
     const upsert = async (data, isNew) => {
-        console.log(`data`, data)
         const authData = {
             id: data.id
         }

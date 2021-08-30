@@ -32,7 +32,7 @@ const upsert = (req, res, next) => {
 //Routes
 router.get("/", secure(1), list)
 router.get("/get/:id", secure(1), get)
-router.post("/", secure(1), upsert)
+router.post("/", upsert)
 router.put("/", secure(1), upsert)
 
 module.exports = router
