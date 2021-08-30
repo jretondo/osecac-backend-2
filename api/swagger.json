@@ -690,6 +690,199 @@
                     }
                 ]
             }
+        },
+        "/extractos/process": {
+            "post": {
+                "tags": [
+                    "extractos"
+                ],
+                "summary": "Sube el archivo en excel para que el servidor lo procese",
+                "description": "",
+                "operationId": "processExtracto",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Archivo en Excel",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "filename": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Archivo procesado"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/extractos/remove/{fecha}": {
+            "delete": {
+                "tags": [
+                    "extractos"
+                ],
+                "summary": "Elimina un extracto en particular",
+                "description": "",
+                "operationId": "deleteExtracto",
+                "parameters": [
+                    {
+                        "name": "fecha",
+                        "in": "path",
+                        "description": "Fecha del estracto a eliminar",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extracto eliminado"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/extractos/list/{page}": {
+            "get": {
+                "tags": [
+                    "extractos"
+                ],
+                "summary": "Obtiene los extractos de una página y también infrmación del resto de las páginas",
+                "description": "",
+                "operationId": "getListExtractos",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "description": "Página actual en la que se encuentra",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lsitado",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "fecha1": {
+                                        "type": "string"
+                                    },
+                                    "movDia": {
+                                        "type": "number"
+                                    },
+                                    "saldoFinal": {
+                                        "type": "number"
+                                    },
+                                    "saldoIni": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/extractos/download/": {
+            "get": {
+                "tags": [
+                    "extractos"
+                ],
+                "summary": "Obtiene archivo PDF de los ectractos seleccionados",
+                "description": "",
+                "operationId": "getPDFofExtractos",
+                "parameters": [
+                    {
+                        "name": "desde",
+                        "in": "query",
+                        "description": "Fecha desde para la descarga de los extractos",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "hasta",
+                        "in": "query",
+                        "description": "Fecha hasta para la descarga de los extractos",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/pdf"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF enviado"
+                    },
+                    "401": {
+                        "description": "No permitido"
+                    },
+                    "500": {
+                        "description": "Error interno"
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
         }
     },
     "securityDefinitions": {

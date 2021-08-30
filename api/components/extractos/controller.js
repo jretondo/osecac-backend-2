@@ -6,6 +6,7 @@ const path = require('path')
 const getPages = require('../../../utils/getPages')
 const formatDate = require('../../../utils/FormatDate')
 const formatMoney = require('../../../utils/NumberFormat')
+const moment = require('moment')
 
 module.exports = (injectedStore) => {
     let store = injectedStore
@@ -48,10 +49,10 @@ module.exports = (injectedStore) => {
     }
 
     const list = async (page, desde, hasta) => {
-        const cantTotal = await store.customQuery(customQuerys.cantExtractos(desde, hasta))
-        console.log(`cantTotal`, cantTotal[0].CANT)
+        const listaFechas = await store.customQuery(customQuerys.cantExtractos(desde, hasta))
+        const cantTotal = parseInt(listaFechas.length)
         const listado = await store.customQuery(customQuerys.listExtractos(desde, hasta, page))
-        const pages = getPages(cantTotal[0].CANT, 10, page)
+        const pages = await getPages(cantTotal, 10, page)
         return {
             listado,
             pages
@@ -59,13 +60,14 @@ module.exports = (injectedStore) => {
     }
 
     const download = async (desde, hasta, privateData, next) => {
-        console.log(`privateData`, privateData)
-        const desdeStr = formatDate(new Date(desde), "dd/mm/yyyy")
-        const hastaStr = formatDate(new Date(hasta), "dd/mm/yyyy")
+        console.log(`desde`, desde)
+        const desdeStr = moment(desde, "YYYY-MM-DD").format("DD/MM/YYYY")
+        const hastaStr = moment(hasta, "YYYY-MM-DD").format("DD/MM/YYYY")
+        console.log(`hastaSrt`, hastaStr)
         let datosIniciales = await store.customQuery(customQuerys.saldoInicial(desde))
         const saldoinicial = datosIniciales[0].saldoIni
         const saldoIniStr = formatMoney(saldoinicial)
-        const fechaIni = formatDate(datosIniciales[0].fechaAnt, "dd/mm/yyyy")
+        const fechaIni = moment(datosIniciales[0].fechaAnt, "YYYY-MM-DD").format("DD/MM/YYYY")
         let gastos = await store.customQuery(customQuerys.totalGastos(desde, hasta))
         gastos = formatMoney(- gastos[0].gastos)
         let impuestos = await store.customQuery(customQuerys.totalImpuestos(desde, hasta))

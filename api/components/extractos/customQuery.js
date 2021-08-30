@@ -22,9 +22,9 @@ const listExtractos = (desde, hasta, pagAct) => {
 
 const cantExtractos = (desde, hasta) => {
     if (desde && hasta) {
-        return ` SELECT COUNT(*) AS CANT FROM extractos_bco_cba WHERE saldo_ini = 0 AND fecha >= ${desde} AND fecha <= ${hasta} `
+        return ` SELECT fecha FROM extractos_bco_cba WHERE saldo_ini = 0 AND fecha >= '${desde}' AND fecha <= '${hasta}' GROUP BY fecha ORDER BY fecha DESC `
     } else {
-        return ` SELECT COUNT(*) AS CANT FROM extractos_bco_cba WHERE saldo_ini = 0 `
+        return ` SELECT fecha FROM extractos_bco_cba WHERE saldo_ini = 0 GROUP BY fecha ORDER BY fecha DESC `
     }
 }
 
