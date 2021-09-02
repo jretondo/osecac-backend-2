@@ -4,6 +4,7 @@ const formatMoney = require('../../../utils/NumberFormat')
 const ejs = require("ejs")
 const pdf = require("html-pdf")
 const path = require('path')
+const moment = require('moment')
 
 const getDataSheet = (fileUrl) => {
     const workBook = XLSX.readFile(fileUrl)
@@ -35,8 +36,7 @@ const transformToDate = (rawDate) => {
     }
 
     fecha = anio + "-" + mes + "-" + dia
-    fecha = formatDate(new Date(fecha), "yyyy-mm-dd")
-
+    fecha = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
     return fecha
 }
 
@@ -82,8 +82,7 @@ const renderReport = async (datos, desde, hasta, next) => {
     return new Promise((resolve, reject) => {
         ejs.renderFile(path.join("reports", "ejs", "Extracto", "index.ejs"), datos, (err, data) => {
             const options = {
-                "height": "18in",
-                "width": "12in",
+                "format": "A4",
                 "border": {
                     "right": "0.5cm",
                     "left": "0.5cm",
