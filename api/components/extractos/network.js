@@ -40,9 +40,18 @@ const download = (req, res, next) => {
         .catch(next)
 }
 
+const get = (req, res, next) => {
+    Controller.getMovimientos(req.params.page, req.query.fecha, req.query.filtro)
+        .then((list) => {
+            response.success(req, res, 200, list)
+        })
+        .catch(next)
+}
+
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
 router.delete("/remove/:fecha", secure(3), remove)
 router.get("/list/:page", secure(3), list)
-router.get("/download/", download)
+router.get("/download/", secure(3), download)
+router.get("/detalles/:page", secure(3), get)
 module.exports = router

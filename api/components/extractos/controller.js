@@ -4,7 +4,6 @@ const functions = require("./functions")
 const customQuerys = require("./customQuery")
 const path = require('path')
 const getPages = require('../../../utils/getPages')
-const formatDate = require('../../../utils/FormatDate')
 const formatMoney = require('../../../utils/NumberFormat')
 const moment = require('moment')
 
@@ -86,10 +85,28 @@ module.exports = (injectedStore) => {
         return await functions.renderReport(datosRender, desde, hasta, next)
     }
 
+    const get = async (fecha) => {
+        const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
+        return await store.customQuery(customQuerys.detalleDia(TABLA, fechaFormat))
+    }
+
+    const getMovimientos = async (page, fecha, filtro) => {
+        const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const listado = await store.customQuery(customQuerys.movimientosBco(fechaFormat, fechaFormat, true, filtro, page))
+        const cantMov = await store.customQuery(customQuerys.cantMov(fechaFormat, filtro))
+        const pages = await getPages(cantMov, 10, page)
+        return {
+            listado,
+            pages
+        }
+    }
+
     return {
         process,
         remove,
         list,
-        download
+        download,
+        get,
+        getMovimientos
     }
 }

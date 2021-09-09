@@ -32,8 +32,25 @@ const saldoInicial = (desde) => {
     return ` SELECT sum(monto) AS saldoIni, MAX(fecha) AS fechaAnt FROM extractos_bco_cba WHERE fecha < '${desde}' `
 }
 
-const movimientosBco = (desde, hasta) => {
-    return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+const movimientosBco = (desde, hasta, detalle, filtro, pagAct) => {
+    if (detalle) {
+        const desdePag = ((parseInt(pagAct) - 1) * 10)
+        if (filtro) {
+            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${descripcion}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
+        } else {
+            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
+        }
+    } else {
+        return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+    }
+}
+
+const cantMov = (fecha, filtro) => {
+    if (filtro) {
+        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha = '${fecha}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${descripcion}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+    } else {
+        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE  fecha = '${fecha}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+    }
 }
 
 const totalGastos = (desde, hasta) => {
@@ -44,6 +61,10 @@ const totalImpuestos = (desde, hasta) => {
     return ` SELECT SUM(monto) AS impuestos FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND (id_tipo = 8 OR id_tipo = 9) `
 }
 
+const detalleDia = (table, fecha) => {
+    return ` SELECT * FROM ${table} WHERE fecha = '${fecha}' `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
@@ -52,5 +73,7 @@ module.exports = {
     saldoInicial,
     movimientosBco,
     totalGastos,
-    totalImpuestos
+    totalImpuestos,
+    detalleDia,
+    cantMov
 }
