@@ -6,6 +6,7 @@ const path = require('path')
 const getPages = require('../../../utils/getPages')
 const formatMoney = require('../../../utils/NumberFormat')
 const moment = require('moment')
+const { error } = require("console")
 
 module.exports = (injectedStore) => {
     let store = injectedStore
@@ -90,6 +91,10 @@ module.exports = (injectedStore) => {
         return await store.customQuery(customQuerys.detalleDia(TABLA, fechaFormat))
     }
 
+    const getOne = async (id) => {
+        return await store.get(TABLA, id)
+    }
+
     const getMovimientos = async (page, fecha, filtro) => {
         const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
         const listado = await store.customQuery(customQuerys.movimientosBco(fechaFormat, fechaFormat, true, filtro, page))
@@ -101,22 +106,63 @@ module.exports = (injectedStore) => {
         }
     }
 
-    const upsert = async (body) => {
+    const upsert = async (body, user) => {
         const mov = {
             fecha: body.fecha,
             concepto: body.concepto,
             descripcion: body.descripcion,
-            nro_cbte: body.nroCbte,
+            nro_cbte: body.nro_cbte,
             monto: body.monto,
-            id_tipo: body.idTipo,
-            cr_deb: body.crDeb
+            id_tipo: body.id_tipo,
+            cr_deb: body.cr_deb,
+            conciliado: 0,
+            id_libro: 0,
+            id_usu: user.id,
+            saldo_ini: 0
         }
 
         if (body.id) {
-            mov.id_usu = body.id
+            mov.id = body.id
             return await store.update(TABLA, mov)
         } else {
             return await store.insert(TABLA, mov)
+        }
+    }
+
+    const difMov = async (id, body, user, next) => {
+        const dataRow = (await getOne(id))[0]
+        dataRow.id = id
+        dataRow.monto = body.amount
+        const newRow = {
+            fecha: dataRow.fecha,
+            concepto: body.concepto,
+            descripcion: "",
+            nro_cbte: dataRow.nro_cbte,
+            id_tipo: 7,
+            cr_deb: body.crDb,
+            monto: body.dif
+        }
+
+        const resultUpdate = await upsert(dataRow, user)
+        const aff1 = parseInt(resultUpdate.affectedRows)
+
+        if (aff1 > 0) {
+            const resultNew = await upsert(newRow, user)
+            const aff2 = parseInt(resultNew.affectedRows)
+            if (aff2 > 0) {
+                return ""
+            } else {
+                dataRow.monto = body.original
+                await upsert(dataRow, user)
+                    .then(() => {
+                        next(error("Error inesperado", 500))
+                    })
+                    .catch(() => {
+                        next(error("Error inesperado", 500))
+                    })
+            }
+        } else {
+            next(error("Error inesperado", 500))
         }
     }
 
@@ -126,7 +172,9 @@ module.exports = (injectedStore) => {
         list,
         download,
         get,
+        getOne,
         getMovimientos,
-        upsert
+        upsert,
+        difMov
     }
 }

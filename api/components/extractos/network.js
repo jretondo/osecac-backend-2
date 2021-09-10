@@ -56,8 +56,12 @@ const get = (req, res, next) => {
         .catch(next)
 }
 
-const update = (req, res, next) => {
-
+const update = async (req, res, next) => {
+    Controller.difMov(req.params.id, req.body, req.user)
+        .then(() => {
+            response.success(req, res, 200)
+        })
+        .catch(next)
 }
 
 //Routes
@@ -67,4 +71,5 @@ router.delete("/removeId/:id", secure(3), removeOne)
 router.get("/list/:page", secure(3), list)
 router.get("/download/", secure(3), download)
 router.get("/:page", secure(3), get)
+router.put("/:id", secure(3), update)
 module.exports = router
