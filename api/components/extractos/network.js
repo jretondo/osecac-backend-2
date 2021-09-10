@@ -17,9 +17,17 @@ const process = (req, res, next) => {
 }
 
 const remove = (req, res, next) => {
-    Controller.remove(req.params.fecha)
+    Controller.remove({ fecha: req.params.fecha })
         .then(() => {
             response.success(req, res, 200, "Extracto eliminado")
+        })
+        .catch(next)
+}
+
+const removeOne = (req, res, next) => {
+    Controller.remove({ id: req.params.id })
+        .then(() => {
+            response.success(req, res, 200, "Movimiento eliminado")
         })
         .catch(next)
 }
@@ -48,10 +56,15 @@ const get = (req, res, next) => {
         .catch(next)
 }
 
+const update = (req, res, next) => {
+
+}
+
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
-router.delete("/remove/:fecha", secure(3), remove)
+router.delete("/:fecha", secure(3), remove)
+router.delete("/removeId/:id", secure(3), removeOne)
 router.get("/list/:page", secure(3), list)
 router.get("/download/", secure(3), download)
-router.get("/detalles/:page", secure(3), get)
+router.get("/:page", secure(3), get)
 module.exports = router

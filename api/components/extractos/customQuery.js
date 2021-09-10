@@ -36,7 +36,7 @@ const movimientosBco = (desde, hasta, detalle, filtro, pagAct) => {
     if (detalle) {
         const desdePag = ((parseInt(pagAct) - 1) * 10)
         if (filtro) {
-            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${descripcion}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
+            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
         } else {
             return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
         }
@@ -47,7 +47,7 @@ const movimientosBco = (desde, hasta, detalle, filtro, pagAct) => {
 
 const cantMov = (fecha, filtro) => {
     if (filtro) {
-        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha = '${fecha}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${descripcion}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha = '${fecha}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
     } else {
         return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE  fecha = '${fecha}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
     }

@@ -17,7 +17,6 @@ exports.error = (req, res, status = 500, message = 'Error interno') => {
 }
 
 exports.file = (req, res, filePath, contentType, filenameDownload) => {
-    console.log(`filePath`, filePath)
     var file = fs.createReadStream(filePath)
     var stat = fs.statSync(filePath)
     res.setHeader('Content-Length', stat.size)

@@ -43,8 +43,8 @@ module.exports = (injectedStore) => {
         return store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
     }
 
-    const remove = (fecha) => {
-        return store.remove(TABLA, { fecha: fecha })
+    const remove = (query) => {
+        return store.remove(TABLA, query)
     }
 
     const list = async (page, desde, hasta) => {
@@ -94,10 +94,29 @@ module.exports = (injectedStore) => {
         const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
         const listado = await store.customQuery(customQuerys.movimientosBco(fechaFormat, fechaFormat, true, filtro, page))
         const cantMov = await store.customQuery(customQuerys.cantMov(fechaFormat, filtro))
-        const pages = await getPages(cantMov, 10, page)
+        const pages = await getPages(cantMov[0].cant, 10, page)
         return {
             listado,
             pages
+        }
+    }
+
+    const upsert = async (body) => {
+        const mov = {
+            fecha: body.fecha,
+            concepto: body.concepto,
+            descripcion: body.descripcion,
+            nro_cbte: body.nroCbte,
+            monto: body.monto,
+            id_tipo: body.idTipo,
+            cr_deb: body.crDeb
+        }
+
+        if (body.id) {
+            mov.id_usu = body.id
+            return await store.update(TABLA, mov)
+        } else {
+            return await store.insert(TABLA, mov)
         }
     }
 
@@ -107,6 +126,7 @@ module.exports = (injectedStore) => {
         list,
         download,
         get,
-        getMovimientos
+        getMovimientos,
+        upsert
     }
 }
