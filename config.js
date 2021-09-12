@@ -14,6 +14,12 @@ if (process.env.ENTORNO_A === "PROD") {
             password: process.env.PASS_DB,
             database: process.env.DB_NAME
         },
+        mysql2: {
+            host: process.env.HOST_DB,
+            user: process.env.USER_DB,
+            password: process.env.PASS_DB,
+            database: process.env.DB_NAME_PROV
+        },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
             ctaBcoCba: process.env.NRO_CTA_BCO_CBA
@@ -33,6 +39,12 @@ if (process.env.ENTORNO_A === "PROD") {
             password: process.env.PASS_DB,
             database: process.env.DB_NAME_TEST
         },
+        mysql2: {
+            host: process.env.HOST_DB,
+            user: process.env.USER_DB,
+            password: process.env.PASS_DB,
+            database: process.env.DB_NAME_PROV
+        },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
             ctaBcoCba: process.env.NRO_CTA_BCO_CBA
@@ -51,6 +63,12 @@ if (process.env.ENTORNO_A === "PROD") {
             user: process.env.USER_DB_TEST_CASA,
             password: process.env.PASS_DB_TEST_CASA,
             database: process.env.DB_NAME_TEST
+        },
+        mysql2: {
+            host: process.env.HOST_DB_TEST_CASA,
+            user: process.env.USER_DB_TEST_CASA,
+            password: process.env.PASS_DB_TEST_CASA,
+            database: process.env.DB_NAME_PROV
         },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
