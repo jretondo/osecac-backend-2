@@ -29,10 +29,19 @@ const upsert = (req, res, next) => {
         .catch(next)
 }
 
+const recPass = async (req, res, next) => {
+    Controller.recPass(req.body.user, next)
+        .then(() => {
+            response.success(req, res, 200)
+        })
+        .catch(next)
+}
+
 //Routes
 router.get("/", secure(1), list)
 router.get("/get/:id", secure(1), get)
 router.post("/", upsert)
 router.put("/", secure(1), upsert)
+router.put("/recPass", recPass)
 
 module.exports = router

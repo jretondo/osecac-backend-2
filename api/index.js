@@ -1,9 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
+const ejs = require('ejs')
 require('dotenv').config({
     path: path.join(__dirname, "..", ".env")
 })
+
 const errors = require('../network/errors')
 const config = require('../config')
 const user = require('./components/user/network')
@@ -13,6 +15,7 @@ const routes = require('./components/routes/network')
 const extractos = require('./components/extractos/network')
 const libroBco = require('./components/libroBcoCba/network')
 const prestadores = require('./components/prestadores/network')
+const templateView = require('./components/templateView/network')
 const swaggerUi = require('swagger-ui-express')
 const swaggerDoc = require('./swagger.json')
 
@@ -29,6 +32,7 @@ app.use('/api/routes', routes)
 app.use('/api/extractos', extractos)
 app.use('/api/libroBco', libroBco)
 app.use('/api/prestadores', prestadores)
+app.use('/api/viewsRender', templateView)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
 
 app.use(errors)

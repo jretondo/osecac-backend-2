@@ -1,6 +1,8 @@
 const TABLA = 'users'
 const err = require('../../../utils/error')
 const auth = require('../auth')
+const customQuerys = require("./customQuery")
+const functions = require("./functions")
 
 module.exports = (injectedStore) => {
     let store = injectedStore
@@ -47,9 +49,35 @@ module.exports = (injectedStore) => {
         }
     }
 
+    const recPass = async (user, next) => {
+        const userData = await store.customQuery(customQuerys.getUserDataWithAny(TABLA, user))
+        const idUser = userData[0].id
+        const userEmail = userData[0].email
+        const userName = userData[0].username
+        const nvaPass = await functions.passCreator()
+        const newAuth = {
+            password: nvaPass,
+            id: idUser,
+            prov: 1
+        }
+
+        const result = await auth.upsert(newAuth, false)
+        const affected = result.affectedRows
+        if (affected > 0) {
+            try {
+                return await functions.sendPass(userEmail, userName, nvaPass)
+            } catch (error) {
+                throw next(err(error, 500))
+            }
+        } else {
+            throw next(err("No se cambió la contraseña", 500))
+        }
+    }
+
     return {
         list,
         get,
-        upsert
+        upsert,
+        recPass
     }
 }

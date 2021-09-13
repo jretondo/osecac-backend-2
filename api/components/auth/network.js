@@ -16,7 +16,8 @@ const login = (req, res, next) => {
 const changePass = (req, res, next) => {
     Controller.upsert({
         id: req.user.id,
-        password: req.body.password
+        password: req.body.password,
+        prov: '0'
     }, false)
         .then(data => {
             response.success(req, res, 200, data)
