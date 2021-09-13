@@ -22,8 +22,8 @@ const get = (req, res, next) => {
 }
 
 //Routes
-router.post("/", secure(1), upsert)
-router.put("/", secure(1), upsert)
-router.get("/", secure(1), get)
+router.post("/", upsert)
+router.put("/", upsert)
+router.get("/", secure(false), get)
 
 module.exports = router
