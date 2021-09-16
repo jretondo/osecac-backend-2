@@ -37,14 +37,19 @@ const getToken = (auth, next) => {
     return token
 }
 
-const verify = (token) => {
-    return jwt.verify(token, configJWT.secret)
+const verify = (token, next) => {
+    try {
+        return jwt.verify(token, configJWT.secret)
+    } catch (err) {
+        next(error("Token Invalido", 400))
+    }
+
 }
 
 const decodeHeader = (req, next) => {
     const authorization = req.headers.authorization || ""
     const token = getToken(authorization, next)
-    const decoded = verify(token)
+    const decoded = verify(token, next)
     req.user = decoded
     return decoded
 }

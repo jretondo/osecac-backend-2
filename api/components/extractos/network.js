@@ -64,12 +64,22 @@ const update = async (req, res, next) => {
         .catch(next)
 }
 
+const calcGstosImp = async (req, res, next) => {
+    Controller.calcGstosImp(req.query.desde, req.query.hasta)
+        .then((data) => {
+            response.success(req, res, 200, data)
+        })
+        .catch(next)
+}
+
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
-router.delete("/:fecha", secure(3), remove)
+router.put("/:id", secure(3), update)
 router.delete("/removeId/:id", secure(3), removeOne)
+router.delete("/:fecha", secure(3), remove)
+router.get("/calcGstos", secure(3), calcGstosImp)
 router.get("/list/:page", secure(3), list)
 router.get("/download/", secure(3), download)
 router.get("/:page", secure(3), get)
-router.put("/:id", secure(3), update)
+
 module.exports = router

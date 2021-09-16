@@ -166,6 +166,20 @@ module.exports = (injectedStore) => {
         }
     }
 
+    const calcGstosImp = async (desde, hasta) => {
+        const desdeStr = moment(desde, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const hastaStr = moment(hasta, "YYYY-MM-DD").format("YYYY-MM-DD")
+        let gastos = await store.customQuery(customQuerys.totalGastos(desdeStr, hastaStr))
+        gastos = formatMoney(- gastos[0].gastos)
+        let impuestos = await store.customQuery(customQuerys.totalImpuestos(desdeStr, hastaStr))
+        impuestos = formatMoney(- impuestos[0].impuestos)
+
+        return {
+            gastos,
+            impuestos
+        }
+    }
+
     return {
         process,
         remove,
@@ -175,6 +189,7 @@ module.exports = (injectedStore) => {
         getOne,
         getMovimientos,
         upsert,
-        difMov
+        difMov,
+        calcGstosImp
     }
 }
