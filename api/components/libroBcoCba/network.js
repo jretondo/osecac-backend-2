@@ -10,7 +10,7 @@ const path = require('path')
 const process = (req, res, next) => {
     Controller.process(req.files[0].fieldname, req.user.id, req.body)
         .then(() => {
-            response.success(req, res, 201, "Extracto procesado")
+            response.success(req, res, 201, "Excel procesado")
         })
         .catch(next)
 }
