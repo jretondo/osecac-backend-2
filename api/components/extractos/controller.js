@@ -180,6 +180,22 @@ module.exports = (injectedStore) => {
         }
     }
 
+    const listWithOut = async () => {
+        return await store.customQuery(customQuerys.getWithOut(TABLA))
+    }
+
+    const update = async (idMov, set) => {
+        console.log(`set`, set)
+        console.log(`object`, {
+            id: idMov,
+            ...set
+        })
+        return await store.update(TABLA, {
+            id: idMov,
+            ...set
+        })
+    }
+
     return {
         process,
         remove,
@@ -190,6 +206,8 @@ module.exports = (injectedStore) => {
         getMovimientos,
         upsert,
         difMov,
-        calcGstosImp
+        calcGstosImp,
+        listWithOut,
+        update
     }
 }

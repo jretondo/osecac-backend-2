@@ -86,6 +86,7 @@ const remove = (table, data) => {
 }
 
 const update = (table, data) => {
+    console.log(`data`, data)
     return new Promise((resolve, reject) => {
         let { id, ...datos2 } = data
         connection.query(` UPDATE ${table} SET ? WHERE id = ? `, [datos2, data.id], (err, result) => {

@@ -65,6 +65,10 @@ const detalleDia = (table, fecha) => {
     return ` SELECT * FROM ${table} WHERE fecha = '${fecha}' `
 }
 
+const getWithOut = (table) => {
+    return ` SELECT * FROM ${table} WHERE id_tipo is null `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
@@ -75,5 +79,6 @@ module.exports = {
     totalGastos,
     totalImpuestos,
     detalleDia,
-    cantMov
+    cantMov,
+    getWithOut
 }
