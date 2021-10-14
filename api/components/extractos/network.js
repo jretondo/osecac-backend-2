@@ -88,12 +88,21 @@ const updateCustom = async (req, res, next) => {
         .catch(next)
 }
 
+const listTiposMov = async (req, res, next) => {
+    Controller.listTiposMov()
+        .then((list) => {
+            response.success(req, res, 200, list)
+        })
+        .catch(next)
+}
+
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
 router.put("/:id", secure(3), update)
 router.patch("/:id", secure(3), updateCustom)
 router.delete("/removeId/:id", secure(3), removeOne)
 router.delete("/:fecha", secure(3), remove)
+router.get("/tiposMov", secure(3), listTiposMov)
 router.get("/sin", secure(3), listWithOut)
 router.get("/calcGstos", secure(3), calcGstosImp)
 router.get("/list/:page", secure(3), list)

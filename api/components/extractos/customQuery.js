@@ -69,6 +69,10 @@ const getWithOut = (table) => {
     return ` SELECT * FROM ${table} WHERE id_tipo is null `
 }
 
+const typeMovGroup = (table) => {
+    return ` SELECT * FROM ${table} GROUP BY tipo_name `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
@@ -80,5 +84,6 @@ module.exports = {
     totalImpuestos,
     detalleDia,
     cantMov,
-    getWithOut
+    getWithOut,
+    typeMovGroup
 }

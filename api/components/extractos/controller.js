@@ -185,15 +185,14 @@ module.exports = (injectedStore) => {
     }
 
     const update = async (idMov, set) => {
-        console.log(`set`, set)
-        console.log(`object`, {
-            id: idMov,
-            ...set
-        })
         return await store.update(TABLA, {
             id: idMov,
             ...set
         })
+    }
+
+    const listTiposMov = async () => {
+        return await store.customQuery(customQuerys.typeMovGroup(TABLA2))
     }
 
     return {
@@ -208,6 +207,7 @@ module.exports = (injectedStore) => {
         difMov,
         calcGstosImp,
         listWithOut,
-        update
+        update,
+        listTiposMov
     }
 }
