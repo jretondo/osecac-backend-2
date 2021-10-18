@@ -1,4 +1,28 @@
-let config = []
+let config = {
+    api: {
+        port: process.env.PORT
+    },
+    jwt: {
+        secret: process.env.SECRET
+    },
+    mysql: {
+        host: process.env.HOST_DB,
+        user: process.env.USER_DB,
+        password: process.env.PASS_DB,
+        database: process.env.DB_NAME
+    },
+    mysql2: {
+        host: process.env.HOST_DB,
+        user: process.env.USER_DB,
+        password: process.env.PASS_DB,
+        database: process.env.DB_NAME_PROV
+    },
+    private: {
+        sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
+        ctaBcoCba: process.env.NRO_CTA_BCO_CBA,
+        cbuBcoCba: process.env.CBU_BCO_CBA
+    }
+}
 
 if (process.env.ENTORNO_A === "PROD") {
     config = {
@@ -22,7 +46,8 @@ if (process.env.ENTORNO_A === "PROD") {
         },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
-            ctaBcoCba: process.env.NRO_CTA_BCO_CBA
+            ctaBcoCba: process.env.NRO_CTA_BCO_CBA,
+            cbuBcoCba: process.env.CBU_BCO_CBA
         }
     }
 } else if (process.env.ENTORNO_A === "TEST") {
@@ -47,7 +72,8 @@ if (process.env.ENTORNO_A === "PROD") {
         },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
-            ctaBcoCba: process.env.NRO_CTA_BCO_CBA
+            ctaBcoCba: process.env.NRO_CTA_BCO_CBA,
+            cbuBcoCba: process.env.CBU_BCO_CBA
         }
     }
 } else {
@@ -72,7 +98,8 @@ if (process.env.ENTORNO_A === "PROD") {
         },
         private: {
             sucursalBcoCba: process.env.SUCURSAL_BCO_CBA,
-            ctaBcoCba: process.env.NRO_CTA_BCO_CBA
+            ctaBcoCba: process.env.NRO_CTA_BCO_CBA,
+            cbuBcoCba: process.env.CBU_BCO_CBA
         }
     }
 }
