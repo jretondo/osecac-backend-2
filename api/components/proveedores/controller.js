@@ -36,7 +36,8 @@ module.exports = (injectedStore) => {
             banco: body.banco,
             cuit: body.cuit,
             tipo_prov: body.tipo_prov,
-            nombre_chq: body.nombre_chq
+            nombre_chq: body.nombre_chq,
+            nombre_bco: body.nombre_bco
         }
         if (body.id) {
             user.id = body.id
