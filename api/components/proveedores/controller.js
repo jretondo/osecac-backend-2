@@ -21,6 +21,10 @@ module.exports = (injectedStore) => {
         }
     }
 
+    const list2 = async (palabra, tipo, cbu) => {
+        return await store.customQuery(customQuerys.getList(TABLA, palabra, tipo, cbu))
+    }
+
     const get = (id) => {
         return store.get(TABLA, id)
     }
@@ -40,7 +44,7 @@ module.exports = (injectedStore) => {
             nombre_bco: body.nombre_bco
         }
         if (body.id) {
-            user.id = body.id
+            prov.id = body.id
             return await store.update(TABLA, prov)
         } else {
             return await store.insert(TABLA, prov)
@@ -51,14 +55,14 @@ module.exports = (injectedStore) => {
         return new Promise((resolve, reject) => {
             let textIn = ""
             let total = 0
-            body.list.map(async (item, key) => {
+            body.map(async (item, key) => {
                 const fila = await functions.newLine(item, cbuOrigen)
                 total = total + parseFloat(item.importe)
-                textIn = textIn + fila + "\n"
+                textIn = textIn + fila + "\r\n"
 
-                if (key === (body.list.length) - 1) {
-                    const ultFila = await functions.finalLine(key + 1, total)
-                    textIn = textIn + ultFila + "\n"
+                if (key === (body.length) - 1) {
+                    const ultFila = await functions.finalLine(key + 2, total)
+                    textIn = textIn + ultFila + "\r\n"
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                     const file = path.join("Archivos", "Process-text-files", "Archivo pagos prov " + uniqueSuffix + ".txt")
 
@@ -85,6 +89,7 @@ module.exports = (injectedStore) => {
         get,
         upsert,
         newTxt,
-        remove
+        remove,
+        list2
     }
 }

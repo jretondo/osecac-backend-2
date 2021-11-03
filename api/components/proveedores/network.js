@@ -14,6 +14,14 @@ const list = (req, res, next) => {
         .catch(next)
 }
 
+const list2 = (req, res, next) => {
+    Controller.list2(req.query.palabra, req.query.tipo, req.query.cbu)
+        .then(lista => {
+            response.success(req, res, 200, lista)
+        })
+        .catch(next)
+}
+
 const get = (req, res, next) => {
     Controller.get(parseInt(req.params.id))
         .then(user => {
@@ -33,7 +41,7 @@ const upsert = (req, res, next) => {
 const newTxt = (req, res, next) => {
     Controller.newTxt(req.body, config.private.cbuBcoCba)
         .then((respuesta) => {
-            response.file(req, res, respuesta.filePath, 'text/html', "Archivo pagos prov " + respuesta.fileName + ".txt")
+            response.file(req, res, respuesta.filePath, 'text/plain', "Archivo pagos prov " + respuesta.fileName + ".txt")
         })
         .catch(next)
 }
@@ -50,8 +58,9 @@ const remove = (req, res, next) => {
 router.get("/get/:id", secure(4), get)
 router.post("/newTxt", secure(4), newTxt)
 router.get("/:page", secure(4), list)
+router.get("/", secure(4), list2)
 router.post("/", secure(4), upsert)
 router.put("/", secure(4), upsert)
-router.delete("/", secure(4), remove)
+router.delete("/:id", secure(4), remove)
 
 module.exports = router
