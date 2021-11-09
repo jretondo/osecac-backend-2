@@ -45,6 +45,7 @@ const transformToMoney = (rawNumber) => {
 const listaMovExtracto = async (rawList) => {
     return new Promise((resolve, reject) => {
         listaItems = []
+        let total = 0
         rawList.map(item => {
             const fecha = formatDate(item.fecha, "dd/mm/yyyy")
             const comprobante = item.nro_cbte
@@ -52,7 +53,7 @@ const listaMovExtracto = async (rawList) => {
             const descripcion2 = item.descripcion
             const tipo = item.id_tipo
             const monto = formatMoney(item.monto)
-
+            total = total + parseFloat(item.monto)
             listaItems.push({
                 fecha,
                 comprobante,
@@ -62,13 +63,13 @@ const listaMovExtracto = async (rawList) => {
                 monto
             })
         })
-        resolve(listaItems)
+        resolve({ listaItems, total: formatMoney(total) })
     })
 }
 
 const renderReport = async (datos, desde, hasta, next) => {
     return new Promise((resolve, reject) => {
-        ejs.renderFile(path.join("reports", "ejs", "Extracto", "index.ejs"), datos, (err, data) => {
+        ejs.renderFile(path.join("reports", "ejs", "Transferencias", "index.ejs"), datos, (err, data) => {
             const options = {
                 "format": "A4",
                 "border": {
@@ -85,11 +86,11 @@ const renderReport = async (datos, desde, hasta, next) => {
                 },
             };
 
-            pdf.create(data, options).toFile(path.join("Archivos", "Transferencias-PDF", "Transferencias " + desde + " al " + hasta + ".pdf"), async function (err, data) {
+            pdf.create(data, options).toFile(path.join("Archivos", "Transferencias-PDF", "Transferencias-" + desde + "-al-" + hasta + ".pdf"), async function (err, data) {
                 if (err) {
                     next()
                 } else {
-                    resolve(path.join("Archivos", "Transferencias-PDF", "Transferencias " + desde + " al " + hasta + ".pdf"))
+                    resolve(path.join("Archivos", "Transferencias-PDF", "Transferencias-" + desde + "-al-" + hasta + ".pdf"))
                 }
             })
         })

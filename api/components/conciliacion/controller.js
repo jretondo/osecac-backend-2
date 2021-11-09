@@ -27,11 +27,13 @@ module.exports = (injectedStore) => {
         const desdeStr = moment(desde, "YYYY-MM-DD").format("DD/MM/YYYY")
         const hastaStr = moment(hasta, "YYYY-MM-DD").format("DD/MM/YYYY")
         const listaMovRaw = await store.customQuery(customQuerys.getTransf(TABLA, moment(desde).format("YYYY-MM-DD"), moment(hasta).format("YYYY-MM-DD"), pend, busqueda, importe))
-        const listaMov = await functions.listaMovExtracto(listaMovRaw, saldoinicial)
+        const listaMov = await functions.listaMovExtracto(listaMovRaw, 0)
         const datosRender = {
             desde: desdeStr,
             hasta: hastaStr,
-            listaItems: listaMov,
+            total: listaMov.total,
+            fechaIni: desdeStr,
+            listaItems: listaMov.listaItems,
             sucursal: privateData.sucursalBcoCba,
             nroCta: privateData.ctaBcoCba
         }

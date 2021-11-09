@@ -3,6 +3,7 @@ const router = express.Router()
 const secure = require('./secure')
 const response = require("../../../network/response")
 const Controller = require("./index")
+const config = require("../../../config")
 
 //internal Functions
 const getTransf = (req, res, next) => {
@@ -24,7 +25,7 @@ const updateCustom = async (req, res, next) => {
 const download = (req, res, next) => {
     Controller.download(req.query.desde, req.query.hasta, req.query.pend, req.query.busqueda, req.query.importe, config.private, next)
         .then((filePath) => {
-            response.file(req, res, filePath, 'application/pdf', "Extracto-" + req.query.desde + "-al-" + req.query.hasta + ".pdf")
+            response.file(req, res, filePath, 'application/pdf', "Transferencias-" + req.query.desde + "-al-" + req.query.hasta + ".pdf")
         })
         .catch(next)
 }
