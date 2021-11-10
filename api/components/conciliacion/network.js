@@ -23,16 +23,24 @@ const updateCustom = async (req, res, next) => {
 }
 
 const download = (req, res, next) => {
-    Controller.download(req.query.desde, req.query.hasta, req.query.pend, req.query.busqueda, req.query.importe, config.private, next)
+    Controller.download(req.query.desde, req.query.hasta, req.query.pend, req.query.busqueda, req.query.importe, config.private, false, next)
         .then((filePath) => {
             response.file(req, res, filePath, 'application/pdf', "Transferencias-" + req.query.desde + "-al-" + req.query.hasta + ".pdf")
         })
         .catch(next)
 }
 
+const createExcel = (req, res, next) => {
+    Controller.download(req.query.desde, req.query.hasta, req.query.pend, req.query.busqueda, req.query.importe, config.private, true, next)
+        .then((filePath) => {
+            response.file(req, res, filePath, 'application/vnd.ms-excel', "Transferencias-Excel", "Transferencias-" + req.query.desde + "-al-" + req.query.hasta + ".xls")
+        })
+        .catch(next)
+}
+
 //Routes
 router.get("/transf", secure(7), getTransf)
-router.get("/download/", secure(3), download)
-router.patch("/:id", secure(3), updateCustom)
-
+router.get("/download/", secure(7), download)
+router.get("/excel/", secure(7), createExcel)
+router.patch("/:id", secure(7), updateCustom)
 module.exports = router

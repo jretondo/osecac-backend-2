@@ -4,6 +4,7 @@ const ejs = require("ejs")
 const pdf = require("html-pdf")
 const path = require('path')
 const moment = require('moment')
+const XLSX = require("xlsx")
 
 const transformToDate = (rawDate) => {
     let fecha = ""
@@ -53,6 +54,7 @@ const listaMovExtracto = async (rawList) => {
             const descripcion2 = item.descripcion
             const tipo = item.id_tipo
             const monto = formatMoney(item.monto)
+            const montoPure = parseFloat(item.monto)
             total = total + parseFloat(item.monto)
             listaItems.push({
                 fecha,
@@ -60,7 +62,8 @@ const listaMovExtracto = async (rawList) => {
                 descripcion,
                 descripcion2,
                 tipo,
-                monto
+                monto,
+                montoPure
             })
         })
         resolve({ listaItems, total: formatMoney(total) })
@@ -97,9 +100,39 @@ const renderReport = async (datos, desde, hasta, next) => {
     })
 }
 
+const makeExcel = async (listamov, desde, hasta) => {
+    return new Promise((resolve, reject) => {
+        let json = []
+        listamov.listaItems.map((item, key) => {
+            const fecha = moment(item.fecha, "DD/MM/YYYY").format("DD/MM/YYYY")
+            let comprobante = item.descripcion
+            if (item.descripcion2 !== "") {
+                comprobante = "Cr Transf " + item.descripcion
+            }
+            const importe = item.montoPure
+
+            json.push({
+                Fecha: fecha,
+                Detalle: comprobante,
+                Importe: importe
+            })
+
+            if (key === (listamov.listaItems.length - 1)) {
+                let workBook = XLSX.utils.book_new();
+                const workSheet = XLSX.utils.json_to_sheet(json);
+                XLSX.utils.book_append_sheet(workBook, workSheet, `Hoja1`);
+                let exportFileName = path.join("Archivos", "Transferencias-Excel", "Transferencias-" + desde + "-al-" + hasta + ".xls");
+                XLSX.writeFile(workBook, exportFileName);
+                resolve(path.join("Archivos", "Transferencias-Excel", "Transferencias-" + desde + "-al-" + hasta + ".xls"))
+            }
+        })
+    })
+}
+
 module.exports = {
     transformToDate,
     transformToMoney,
     listaMovExtracto,
-    renderReport
+    renderReport,
+    makeExcel
 }
