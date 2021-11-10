@@ -220,8 +220,8 @@
       <tbody>
         <% listaItems.forEach(function(item){ %>
           <%- include('./components/ItemFact.ejs', {fecha: item.fecha, comprobante: item.comprobante, descripcion:
-            item.descripcion, monto: item.monto, saldo: item.saldo, tipo: item.tipo, descripcion2: item.descripcion2 });
-            %>
+            item.descripcion, monto: item.monto, saldo: item.saldo, tipo: item.tipo, descripcion2: item.descripcion2,
+            rendicion: item.rendicion }); %>
             <% }); %>
       </tbody>
       <tfoot>

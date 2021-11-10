@@ -52,6 +52,7 @@ const listaMovExtracto = async (rawList) => {
             const comprobante = item.nro_cbte
             const descripcion = item.concepto
             const descripcion2 = item.descripcion
+            const rendicion = parseInt(item.transf_int)
             const tipo = item.id_tipo
             const monto = formatMoney(item.monto)
             const montoPure = parseFloat(item.monto)
@@ -63,7 +64,8 @@ const listaMovExtracto = async (rawList) => {
                 descripcion2,
                 tipo,
                 monto,
-                montoPure
+                montoPure,
+                rendicion
             })
         })
         resolve({ listaItems, total: formatMoney(total) })

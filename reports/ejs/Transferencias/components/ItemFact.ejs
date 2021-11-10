@@ -1,22 +1,22 @@
-<% if(parseInt(tipo)===3){ %>
+<% if(parseInt(rendicion)===1){ %>
   <tr>
-    <td style="width: 10%;text-align: center;background-color: #eaeaea;">
+    <td style="width: 10%;text-align: center;background-color: #ecfc62;">
       <%- fecha %>
     </td>
-    <td style="width: 15%;text-align: center;background-color: #eaeaea">
+    <td style="width: 15%;text-align: center;background-color: #ecfc62">
       <%- comprobante %>
     </td>
-    <td style="width: 40%;text-align: left;font-size: 10px;background-color: #eaeaea">
+    <td style="width: 40%;text-align: left;font-size: 12px;background-color: #ecfc62">
       <% if(descripcion2==="" ){ %>
         <%- descripcion %>
           <% }else{ %>
             Cr. Transf. <%- descripcion2 %>
               <% }%>
     </td>
-    <td style="width: 15%;text-align: right;background-color: #eaeaea">$ <%- monto %>
+    <td style="width: 15%;text-align: right;background-color: #ecfc62">$ <%- monto %>
     </td>
   </tr>
-  <% }else if(parseInt(tipo)===5){ %>
+  <% }else{ %>
     <tr>
       <td style="width: 10%;text-align: center;">
         <%- fecha %>
@@ -24,28 +24,14 @@
       <td style="width: 15%;text-align: center;">
         <%- comprobante %>
       </td>
-      <td style="width: 40%;text-align: left;font-size: 10px;">
+      <td style="width: 40%;text-align: left;font-size: 12px;">
         <% if(descripcion2==="" ){ %>
           <%- descripcion %>
             <% }else{ %>
-              Pago de Servicio <%- descripcion2 %>
+              Cr. Transf. <%- descripcion2 %>
                 <% }%>
       </td>
       <td style="width: 15%;text-align: right;">$ <%- monto %>
       </td>
     </tr>
-    <% }else{ %>
-      <tr>
-        <td style="width: 10%;text-align: center;">
-          <%- fecha %>
-        </td>
-        <td style="width: 15%;text-align: center;">
-          <%- comprobante %>
-        </td>
-        <td style="width: 40%;text-align: left;font-size: 10px;">
-          <%- descripcion %>
-        </td>
-        <td style="width: 15%;text-align: right;">$ <%- monto %>
-        </td>
-      </tr>
-      <% }%>
+    <% }%>
