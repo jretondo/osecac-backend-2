@@ -201,8 +201,12 @@
       <h2 class="name">C. C. BANCO DE CÓRDOBA $ <%- sucursal %>
           <%- nroCta %>
       </h2>
-      <h3>Transferencias pendientes desde <%- desde %> al <%- hasta %>
-      </h3>
+      <% if(pendiente===1){ %>
+        <h3>Transferencias pendientes desde <%- desde %> al <%- hasta %>
+              <% }else{ %>
+                <h3>Transferencias desde <%- desde %> al <%- hasta %>
+                      <% } %>
+                </h3>
     </div>
     </div>
   </header>

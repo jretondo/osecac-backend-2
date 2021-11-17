@@ -28,7 +28,7 @@ const getPages = async (totalReg, cantPerPage, pageAct) => {
                     }
                 }
 
-                ultPagina = totalPag
+                ultPagina = Math.ceil(totalReg / cantPerPage)
 
                 for (let i = 0; i < totalPag; i++) {
                     const paginaLista = i + 1

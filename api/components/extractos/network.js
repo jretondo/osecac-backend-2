@@ -56,6 +56,14 @@ const get = (req, res, next) => {
         .catch(next)
 }
 
+const get2 = (req, res, next) => {
+    Controller.getMovimientos2(req.params.page, req.query.desde, req.query.hasta, req.query.filtro)
+        .then((list) => {
+            response.success(req, res, 200, list)
+        })
+        .catch(next)
+}
+
 const update = async (req, res, next) => {
     Controller.difMov(req.params.id, req.body, req.user)
         .then(() => {
@@ -107,6 +115,7 @@ router.get("/sin", secure(3), listWithOut)
 router.get("/calcGstos", secure(3), calcGstosImp)
 router.get("/list/:page", secure(3), list)
 router.get("/download/", secure(3), download)
+router.get("/busqueda/:page", secure(3), get2)
 router.get("/:page", secure(3), get)
 
 module.exports = router

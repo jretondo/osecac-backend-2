@@ -24,6 +24,13 @@ module.exports = (injectedStore) => {
     }
 
     const download = async (desde, hasta, pend, busqueda, importe, privateData, excel, next) => {
+        console.log(`pend`, pend)
+        let pendiente
+        if (pend) {
+            pendiente = 1
+        } else {
+            pendiente = 0
+        }
         const desdeStr = moment(desde, "YYYY-MM-DD").format("DD/MM/YYYY")
         const hastaStr = moment(hasta, "YYYY-MM-DD").format("DD/MM/YYYY")
         const listaMovRaw = await store.customQuery(customQuerys.getTransf(TABLA, moment(desde).format("YYYY-MM-DD"), moment(hasta).format("YYYY-MM-DD"), pend, busqueda, importe))
@@ -38,7 +45,8 @@ module.exports = (injectedStore) => {
                 fechaIni: desdeStr,
                 listaItems: listaMov.listaItems,
                 sucursal: privateData.sucursalBcoCba,
-                nroCta: privateData.ctaBcoCba
+                nroCta: privateData.ctaBcoCba,
+                pendiente
             }
             return await functions.renderReport(datosRender, desde, hasta, next)
         }

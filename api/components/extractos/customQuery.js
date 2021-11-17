@@ -33,10 +33,11 @@ const saldoInicial = (desde) => {
 }
 
 const movimientosBco = (desde, hasta, detalle, filtro, pagAct) => {
+    console.log(`filtro`, filtro)
     if (detalle) {
         const desdePag = ((parseInt(pagAct) - 1) * 10)
         if (filtro) {
-            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
+            return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%' OR monto = '${parseFloat(filtro)}') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
         } else {
             return ` SELECT * FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC LIMIT ${desdePag}, 10 `
         }
@@ -50,6 +51,14 @@ const cantMov = (fecha, filtro) => {
         return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha = '${fecha}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
     } else {
         return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE  fecha = '${fecha}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+    }
+}
+
+const cantMov2 = (desde, hasta, filtro) => {
+    if (filtro) {
+        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 AND (concepto LIKE '%${filtro}%' OR concepto LIKE '%${filtro}%' OR nro_cbte LIKE '%${filtro}%' OR monto = '${parseFloat(filtro)}') ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
+    } else {
+        return ` SELECT COUNT(*) as cant FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND saldo_ini = 0 ORDER BY fecha, id_tipo, nro_cbte, concepto ASC `
     }
 }
 
@@ -85,5 +94,6 @@ module.exports = {
     detalleDia,
     cantMov,
     getWithOut,
-    typeMovGroup
+    typeMovGroup,
+    cantMov2
 }

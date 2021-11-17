@@ -106,6 +106,18 @@ module.exports = (injectedStore) => {
         }
     }
 
+    const getMovimientos2 = async (page, desde, hasta, filtro) => {
+        const desdeStr = moment(desde, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const hastaStr = moment(hasta, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const listado = await store.customQuery(customQuerys.movimientosBco(desdeStr, hastaStr, true, filtro, page))
+        const cantMov = await store.customQuery(customQuerys.cantMov2(desdeStr, hastaStr, filtro))
+        const pages = await getPages(cantMov[0].cant, 10, page)
+        return {
+            listado,
+            pages
+        }
+    }
+
     const upsert = async (body, user) => {
         const mov = {
             fecha: body.fecha,
@@ -208,6 +220,7 @@ module.exports = (injectedStore) => {
         calcGstosImp,
         listWithOut,
         update,
-        listTiposMov
+        listTiposMov,
+        getMovimientos2
     }
 }
