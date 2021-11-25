@@ -1,4 +1,5 @@
-const TABLA = 'libro_bco_cba'
+const TABLA = 'chq_bol_rangos'
+const TABLA2 = 'chq_bol_disp'
 const functions = require("./functions")
 const customQuerys = require("./customQuery")
 const path = require('path')
@@ -12,87 +13,126 @@ module.exports = (injectedStore) => {
         store = require('../../../store/dummy')
     }
 
-    const process = async (fileName, idUser, body) => {
-        const fecha = moment(body.fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
-        let nroOp = parseInt(body.nroOp) + 1
-        let nroChq = parseInt(body.nroChq) + 1
-        const dataSheet = functions.getDataSheet(path.join("Archivos", "Libro-Excel-Disca", fileName))
-        const queryValues = await Promise.all(
-            dataSheet.map(async (fila, key) => {
-                const exp = Object.values(fila)[1]
-                const year = "20" + Object.values(fila)[2]
-                const nroProv = Object.values(fila)[3]
-                const totalinvoice = Object.values(fila)[4]
-                const retGcias = Object.values(fila)[5]
-                const retMuni = Object.values(fila)[6]
-                const totalPayment = Object.values(fila)[7]
-
-                const verificInt = parseInt(totalPayment)
-                const esNulo = isNaN(verificInt)
-                if (!esNulo) {
-                    const dataPrest = await prestaController.getNroProv(nroProv)
-                    const razSoc = dataPrest[0].raz_soc
-                    const descr = `DISC. EXP. ${exp}/${year} ${razSoc}`
-                    return customQuerys.singleValueNewMov(fecha, descr, (nroChq + key), (nroOp + key), totalPayment, retMuni, retGcias, totalinvoice, idUser, exp, year)
-                }
-            })
-        )
-        return store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
-    }
-
-    const remove = (query) => {
-        return store.remove(TABLA, query)
-    }
-
-    const list = async (page, desde, hasta) => {
-        const listaFechas = await store.customQuery(customQuerys.cantExtractos(desde, hasta))
-        const cantTotal = parseInt(listaFechas.length)
-        const listado = await store.customQuery(customQuerys.listExtractos(desde, hasta, page))
-        const pages = await getPages(cantTotal, 10, page)
-        return {
-            listado,
-            pages
+    const talonarioUpsert = async (body) => {
+        const newTal = {
+            desde: body.desde,
+            hasta: body.hasta,
+            tipo: body.tipo,
+            completo: 0
         }
-    }
-
-    const get = async (fecha) => {
-        const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
-        return await store.customQuery(customQuerys.detalleDia(TABLA, fechaFormat))
-    }
-
-    const getOne = async (id) => {
-        return await store.get(TABLA, id)
-    }
-
-    const getMovimientos = async (page, fecha, filtro) => {
-        const fechaFormat = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
-        const listado = await store.customQuery(customQuerys.movimientosBco(fechaFormat, fechaFormat, true, filtro, page))
-        const cantMov = await store.customQuery(customQuerys.cantMov(fechaFormat, filtro))
-        const pages = await getPages(cantMov[0].cant, 10, page)
-        return {
-            listado,
-            pages
-        }
-    }
-
-    const upsert = async (body, user) => {
-        body.id_usu = user.id
-
         if (body.id) {
-            mov.id = body.id
-            return await store.update(TABLA, mov)
+            newTal.id = body.id
+            const respuesta = await store.update(TABLA, newTal)
+            const affected = parseInt(respuesta.affectedRows)
+            if (affected > 0) {
+                newTalDisp(newTal, true)
+            } else {
+                throw new Error("Error desconocido")
+            }
         } else {
-            return await store.insert(TABLA, mov)
+            const respuesta = await store.insert(TABLA, newTal)
+            const affected = parseInt(respuesta.affectedRows)
+            if (affected > 0) {
+                newTalDisp(newTal, false)
+            } else {
+                throw new Error("Error desconocido")
+            }
         }
+    }
+
+    const newTalDisp = async (newTal, update) => {
+        if (update) {
+            await removeTalDisp(newTal)
+        }
+        const desde = parseInt(newTal.desde)
+        const hasta = parseInt(newTal.hasta)
+        let queryMov = ""
+        for (let i = desde; i <= hasta; i++) {
+            if (i < hasta) {
+                queryMov = queryMov + customQuerys.newValueTalDisp(i, newTal.tipo) + ", "
+            } else {
+                queryMov = queryMov + customQuerys.newValueTalDisp(i, newTal.tipo)
+            }
+        }
+        const query = customQuerys.insertNewMov(TABLA2, "nro, tipo", queryMov)
+        return store.customQuery(query)
+    }
+
+    const removeTalDisp = async (talDispRange) => {
+        const desde = talDispRange.desde
+        const hasta = talDispRange.hasta
+        const tipo = talDispRange.tipo
+        const query = ` DELETE FROM ${TABLA2} WHERE nro >= ? AND nro <= ? AND tipo = ? `
+        await store.customQuery(query, [desde, hasta, tipo])
+    }
+
+    const removeRange = async (id) => {
+        const dataRange = await store.get(TABLA, id)
+        if (dataRange.length > 0) {
+            const respuesta = await store.remove(TABLA, { id: id })
+            const affected = parseInt(respuesta.affectedRows)
+            if (affected > 0) {
+                removeTalDisp(dataRange[0])
+            } else {
+                throw new Error("Error desconocido")
+            }
+        } else {
+            throw new Error("Error desconocido")
+        }
+    }
+
+    const verificaTal = async (id) => {
+        const dataRange = await store.get(TABLA, id)
+        if (dataRange.length > 0) {
+            const query = ` SELECT COUNT(*) as count FROM ${TABLA2} WHERE nro >= ? AND nro <= ? AND tipo = ? `
+            const cantPend = await store.customQuery(query, [dataRange[0].desde, dataRange[0].hasta, dataRange[0].tipo])
+            if (cantPend[0] > 0) {
+                return 0
+            } else {
+                const data = {
+                    id: id,
+                    completo: 1
+                }
+                await store.update(TABLA, data)
+                return 1
+            }
+        } else {
+            throw new Error("Error desconocido")
+        }
+    }
+
+    const listaTalPend = async () => {
+        const query = ` SELECT * FROM ${TABLA} WHERE completo = '0' ORDER BY tipo, desde `
+        const listaIncompleta = await store.customQuery(query)
+        let listadoBol = []
+        let listadoChq = []
+        return new Promise((resolve, reject) => {
+            if (listaIncompleta.length > 0) {
+                listaIncompleta.map(async (item, key) => {
+                    const completo = await verificaTal(item.id)
+                    item.completo = completo
+                    if (item.tipo === 1) {
+                        listadoChq.push(item)
+                    } else {
+                        listadoBol.push(item)
+                    }
+                    if (key === (listaIncompleta.length - 1)) {
+                        resolve({
+                            listadoChq,
+                            listadoBol
+                        })
+                    }
+                })
+            } else {
+                reject(new Error("Error inesperado"))
+            }
+        })
     }
 
     return {
-        remove,
-        list,
-        get,
-        getOne,
-        getMovimientos,
-        upsert,
-        process
+        talonarioUpsert,
+        removeRange,
+        verificaTal,
+        listaTalPend
     }
 }

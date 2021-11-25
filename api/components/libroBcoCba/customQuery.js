@@ -1,13 +1,13 @@
-const insertNewMov = (table, values) => {
-    let query = ` INSERT INTO ${table} (date, short_descr, n_receipt, haber, op, type, pay_deleg, download_syst, ret_muni, ret_gcias, total_invoices, id_usu, exp, year) VALUES ${values}) `
+const insertNewMov = (table, columns, values) => {
+    let query = ` INSERT INTO ${table} (${columns}) VALUES ${values}) `
     query = query.replace(",,,", "")
     query = query.trimRight()
     query = query.slice(0, parseInt(query.length) - 1)
     return query
 }
 
-const singleValueNewMov = (fecha, descr, nroChq, op, totalNeto, retMuni, retGcias, totalBruto, idUsu, exp, anio) => {
-    return ` ('${fecha}', '${descr}', '${nroChq}', '${totalNeto}', '${op}', '4', '1', '1', '${retMuni}', '${retGcias}', '${totalBruto}', '${idUsu}', '${exp}', '${anio}') `
+const newValueTalDisp = (nro, tipo) => {
+    return ` ('${nro}', '${tipo}') `
 }
 
 const listExtractos = (desde, hasta, pagAct) => {
@@ -67,7 +67,7 @@ const detalleDia = (table, fecha) => {
 
 module.exports = {
     insertNewMov,
-    singleValueNewMov,
+    newValueTalDisp,
     listExtractos,
     cantExtractos,
     saldoInicial,
