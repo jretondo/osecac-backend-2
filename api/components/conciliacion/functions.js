@@ -50,11 +50,7 @@ const listaMovExtracto = async (rawList) => {
         rawList.map(item => {
             const fecha = formatDate(item.fecha, "dd/mm/yyyy")
             const comprobante = item.nro_cbte
-
             let descripcion = item.concepto
-            if (item.descripcion !== "") {
-                descripcion = "Cr Transf. " + item.descripcion
-            }
             const descripcion2 = item.descripcion
             const rendicion = parseInt(item.transf_int)
             const tipo = item.id_tipo
