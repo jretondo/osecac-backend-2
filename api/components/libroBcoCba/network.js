@@ -3,12 +3,10 @@ const router = express.Router()
 const secure = require('./secure')
 const response = require("../../../network/response")
 const Controller = require("./index")
-const uploadFile = require('../../../utils/multer')
-const path = require('path')
 
 //internal Functions
 const upsertTal = async (req, res, next) => {
-    Controller.talonarioUpsert(req.body)
+    Controller.talonarioUpsert(req.body.data)
         .then(() => {
             response.success(req, res, 201)
         })

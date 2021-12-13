@@ -20,23 +20,39 @@ module.exports = (injectedStore) => {
             tipo: body.tipo,
             completo: 0
         }
-        if (body.id) {
-            newTal.id = body.id
-            const respuesta = await store.update(TABLA, newTal)
-            const affected = parseInt(respuesta.affectedRows)
-            if (affected > 0) {
-                newTalDisp(newTal, true)
+        const check = await checkTal(body)
+        if (check) {
+            if (body.id) {
+                newTal.id = body.id
+                const respuesta = await store.update(TABLA, newTal)
+                const affected = parseInt(respuesta.affectedRows)
+                if (affected > 0) {
+                    newTalDisp(newTal, true)
+                } else {
+                    throw new Error("Error desconocido")
+                }
             } else {
-                throw new Error("Error desconocido")
+                const respuesta = await store.insert(TABLA, newTal)
+                const affected = parseInt(respuesta.affectedRows)
+                if (affected > 0) {
+                    newTalDisp(newTal, false)
+                } else {
+                    throw new Error("Error desconocido")
+                }
             }
         } else {
-            const respuesta = await store.insert(TABLA, newTal)
-            const affected = parseInt(respuesta.affectedRows)
-            if (affected > 0) {
-                newTalDisp(newTal, false)
-            } else {
-                throw new Error("Error desconocido")
-            }
+            throw new Error("Pisa numeracíon de talonario!")
+        }
+    }
+
+    const checkTal = async (body) => {
+        const sql = ` SELECT COUNT(*) AS CANT FROM ${TABLA} WHERE (desde <= ${body.desde} AND hasta >= ${body.desde} AND tipo = ${body.tipo}) OR (desde <= ${body.hasta} AND hasta >= ${body.hasta} AND tipo = ${body.tipo}) `
+        const result = await store.customQuery(sql)
+        const cant = result[0].CANT
+        if (cant > 0) {
+            return false
+        } else {
+            return true
         }
     }
 
