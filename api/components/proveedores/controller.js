@@ -59,16 +59,15 @@ module.exports = (injectedStore) => {
                 const fila = await functions.newLine(item, cbuOrigen)
                 total = total + parseFloat(item.importe)
                 textIn = textIn + fila + "\r\n"
-
                 if (key === (body.length) - 1) {
-                    const ultFila = await functions.finalLine(key + 2, total)
+                    const ultFila = await functions.finalLine(key + 2, (Math.round(total * 100) / 100))
                     textIn = textIn + ultFila + "\r\n"
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                     const file = path.join("Archivos", "Process-text-files", "Archivo pagos prov " + uniqueSuffix + ".txt")
-
                     fs.writeFile(file, textIn, function (err) {
                         if (err) {
                             reject(err)
+                            console.log(`err`, err)
                         }
                         resolve({
                             filePath: file,
