@@ -12,7 +12,16 @@ const get = (req, res, next) => {
         .catch(next)
 }
 
+const listPages = (req, res, next) => {
+    Controller.list(req.params.page, req.query.palabra)
+        .then(lista => {
+            response.success(req, res, 200, lista)
+        })
+        .catch(next)
+}
+
 //Routes
+router.get("/list/:page", listPages)
 router.get("/:nroProv", get)
 
 module.exports = router
