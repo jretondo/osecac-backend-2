@@ -83,7 +83,6 @@ module.exports = (injectedStore) => {
             sucursal: privateData.sucursalBcoCba,
             nroCta: privateData.ctaBcoCba
         }
-        console.log(`datosRender`, datosRender)
         return await functions.renderReport(datosRender, desde, hasta, next)
     }
 

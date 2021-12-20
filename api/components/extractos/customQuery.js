@@ -33,10 +33,6 @@ const saldoInicial = (desde) => {
 }
 
 const movimientosBco = (desde, hasta, detalle, filtro, pagAct) => {
-    console.log(`filtro`, filtro)
-    console.log(`detalle`, detalle)
-    console.log(`desde`, desde)
-    console.log(`hasta`, hasta)
     if (detalle) {
         const desdePag = ((parseInt(pagAct) - 1) * 10)
         if (filtro) {
