@@ -33,7 +33,7 @@ const get = (req, res, next) => {
 const upsert = (req, res, next) => {
     Controller.upsert(req.body)
         .then(() => {
-            response.success(req, res, 201, "Usuario creado")
+            response.success(req, res, 201, "Agencia creada")
         })
         .catch(next)
 }

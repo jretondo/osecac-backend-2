@@ -60,6 +60,7 @@ module.exports = (injectedStore) => {
     }
 
     const download = async (desde, hasta, privateData, next) => {
+        console.log(`object`, desde, hasta, privateData)
         const desdeStr = moment(desde, "YYYY-MM-DD").format("DD/MM/YYYY")
         const hastaStr = moment(hasta, "YYYY-MM-DD").format("DD/MM/YYYY")
         let datosIniciales = await store.customQuery(customQuerys.saldoInicial(desde))
