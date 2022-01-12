@@ -1,1 +1,1 @@
-# Backend for Contability Sector from Osecac
+# Backend for Accounting Sector from Osecac
