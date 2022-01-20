@@ -21,27 +21,47 @@ module.exports = (injectedStore) => {
                 const nroCbte = fila.__EMPTY_4
                 const verificInt = parseInt(nroCbte)
                 const esNulo = isNaN(verificInt)
+                let fechaFalsa = false;
+                let fechaAnt = "";
                 if (!esNulo) {
-                    const fecha = functions.transformToDate(fila.__EMPTY)
-                    const concepto = fila.__EMPTY_1
-                    let smallConcepto = concepto.slice(0, 13)
-                    smallConcepto = "%" + smallConcepto + "%"
-                    let descripcion = fila.__EMPTY_2
-                    if (descripcion === undefined) {
-                        descripcion = ""
-                    }
-                    const monto = functions.transformToMoney(fila.__EMPTY_3)
-                    let credito
-                    if (monto < 0) {
-                        credito = 1
+                    const fecha = functions.transformToDate(fila.__EMPTY);
+                    if (!fechaFalsa || fechaAnt !== fecha) {
+                        const cantRegByDate = await getByDate(fecha);
+                        if (cantRegByDate[0].cant === 0) {
+                            fechaFalsa = false;
+                            const concepto = fila.__EMPTY_1
+                            let smallConcepto = concepto.slice(0, 13)
+                            smallConcepto = "%" + smallConcepto + "%"
+                            let descripcion = fila.__EMPTY_2
+                            if (descripcion === undefined) {
+                                descripcion = ""
+                            }
+                            const monto = functions.transformToMoney(fila.__EMPTY_3)
+                            let credito
+                            if (monto < 0) {
+                                credito = 1
+                            } else {
+                                credito = 0
+                            }
+                            return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                        } else {
+                            fechaFalsa = true
+                            return ""
+                        }
                     } else {
-                        credito = 0
+                        return ""
                     }
-                    return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                    fechaAnt = fecha
+                } else {
+                    return ""
                 }
             })
         )
-        return store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+        return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+    }
+
+    const getByDate = async (date) => {
+        return await store.customQuery(customQuerys.getByDate(TABLA, date))
     }
 
     const remove = (query) => {

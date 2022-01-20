@@ -1,7 +1,8 @@
 const insertNewMov = (table, values) => {
     let query = ` INSERT INTO ${table} (fecha,  concepto, nro_cbte, monto, id_tipo, cr_deb, conciliado, id_libro, id_usu, saldo_ini, descripcion) VALUES ${values} `
-    query = query.replace(",,,", "")
-    query = query.trimRight()
+    query = query.replace(/,,,/g, "")
+    query = query.replace(/,,/g, "")
+    query = query.trimEnd()
     query = query.slice(0, parseInt(query.length) - 1)
     return query
 }
@@ -81,6 +82,10 @@ const typeMovGroup = (table) => {
     return ` SELECT * FROM ${table} GROUP BY tipo_name `
 }
 
+const getByDate = (table, date) => {
+    return ` SELECT COUNT(*) as cant FROM ${table} WHERE fecha = '${date}' `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
@@ -94,5 +99,6 @@ module.exports = {
     cantMov,
     getWithOut,
     typeMovGroup,
-    cantMov2
+    cantMov2,
+    getByDate
 }

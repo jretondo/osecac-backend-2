@@ -120,6 +120,7 @@ module.exports = (injectedStore) => {
     const listaTalPend = async () => {
         const query = ` SELECT * FROM ${TABLA} WHERE completo = '0' ORDER BY tipo, desde `
         const listaIncompleta = await store.customQuery(query)
+        console.log(`listaIncompleta`, listaIncompleta)
         let listadoBol = []
         let listadoChq = []
         return new Promise((resolve, reject) => {
@@ -143,6 +144,12 @@ module.exports = (injectedStore) => {
                 reject(new Error("Error inesperado"))
             }
         })
+    }
+
+    const TalPendientes = async () => {
+        const sqlChq = ` SELECT COUNT(*) FROM ${TABLA2} WHERE tipo = '0' `
+        const sqlBol = ` SELECT COUNT(*) FROM ${TABLA2} WHERE tipo = '1' `
+
     }
 
     return {
