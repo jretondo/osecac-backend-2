@@ -39,8 +39,8 @@ const createExcel = (req, res, next) => {
 }
 
 //Routes
-router.get("/transf", secure(7), getTransf)
-router.get("/download/", secure(7), download)
-router.get("/excel/", secure(7), createExcel)
-router.patch("/:id", secure(7), updateCustom)
+router.get("/transf", secure(7), secure(12), getTransf)
+router.get("/download/", secure(7), secure(12), download)
+router.get("/excel/", secure(7), secure(12), createExcel)
+router.patch("/:id", secure(7), secure(12), updateCustom)
 module.exports = router
