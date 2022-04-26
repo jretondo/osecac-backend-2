@@ -18,6 +18,7 @@ router.get("/pagoPrestadores", secure(6), responseSuccess)
 router.get("/conciliacionBancaria", secure(7), responseSuccess)
 router.get("/rendicionesCoseguro", secure(8), responseSuccess)
 router.get("/fiscalizacion", secure(9), responseSuccess)
+router.get("/transferencias", secure(12), responseSuccess)
 router.get("/dashboard", secure(false), responseSuccess)
 router.get("/changePass", secure(false), responseSuccess)
 
