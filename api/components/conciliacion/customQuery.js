@@ -1,4 +1,4 @@
-const getTransf = (table, desde, hasta, pend, busqueda, importe) => {
+const getTransf = (table, desde, hasta, pend, busqueda, importe, sinCos) => {
     let pendStr = ""
     if (pend) {
         pendStr = `AND conciliado = '0'`
@@ -17,7 +17,11 @@ const getTransf = (table, desde, hasta, pend, busqueda, importe) => {
     if (impNumber > 0) {
         impStr = `AND monto = '${impNumber}'`
     }
-    return ` SELECT * FROM ${table} WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = '3' ${pendStr} ${palabra} ${impStr} ORDER BY fecha, monto `
+    let sinCosStr = ""
+    if (sinCos) {
+        sinCosStr = `AND transf_int <> '1'`
+    }
+    return ` SELECT * FROM ${table} WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = '3' ${pendStr} ${palabra} ${impStr} ${sinCosStr} ORDER BY fecha, monto `
 }
 
 module.exports = {

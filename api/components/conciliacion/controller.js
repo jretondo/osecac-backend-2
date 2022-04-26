@@ -19,8 +19,8 @@ module.exports = (injectedStore) => {
         })
     }
 
-    const getTransf = async (desde, hasta, pend, busqueda, importe) => {
-        return await store.customQuery(customQuerys.getTransf(TABLA, moment(desde).format("YYYY-MM-DD"), moment(hasta).format("YYYY-MM-DD"), pend, busqueda, importe))
+    const getTransf = async (desde, hasta, pend, busqueda, importe, sinCos) => {
+        return await store.customQuery(customQuerys.getTransf(TABLA, moment(desde).format("YYYY-MM-DD"), moment(hasta).format("YYYY-MM-DD"), pend, busqueda, importe, sinCos))
     }
 
     const download = async (desde, hasta, pend, busqueda, importe, privateData, excel, next) => {

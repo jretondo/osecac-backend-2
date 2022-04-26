@@ -1,0 +1,43 @@
+{
+    "database.connections": {
+        "1642762009877": {
+            "host": "172.21.10.25",
+            "dbPath": "",
+            "port": "3306",
+            "user": "jretondo",
+            "authType": "default",
+            "password": "javi1990",
+            "encoding": "utf8",
+            "clientKeyPath": null,
+            "clientCertPath": null,
+            "caPath": null,
+            "database": "conta_osecac_test",
+            "useSSL": false,
+            "usingSSH": false,
+            "showHidden": false,
+            "includeDatabases": "conta_osecac_test",
+            "dbType": "MySQL",
+            "encrypt": true,
+            "isCluster": false,
+            "connectionUrl": "",
+            "srv": false,
+            "esAuth": "none",
+            "global": false,
+            "key": "1642762009877",
+            "timezone": "+00:00",
+            "ssh": {
+                "host": "",
+                "privateKeyPath": "C:\\Users\\jretondo\\.ssh\\id_rsa",
+                "port": 22,
+                "username": "root",
+                "type": "password",
+                "connectTimeout": 10000,
+                "algorithms": {
+                    "cipher": []
+                }
+            },
+            "name": "conta_osecac_test",
+            "connectionKey": "database.connections"
+        }
+    }
+}

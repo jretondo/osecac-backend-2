@@ -1,7 +1,9 @@
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
-const ejs = require('ejs')
+const http = require("http")
+const socketIo = require("socket.io")
+
 require('dotenv').config({
     path: path.join(__dirname, "..", ".env")
 })
@@ -26,6 +28,18 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.set("view engine", "ejs")
+
+const server = http.createServer(app)
+
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+app.io = io;
 
 //ROUTER
 app.use('/api/user', user)
@@ -43,6 +57,16 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
 
 app.use(errors)
 
-app.listen(config.api.port, () => {
+io.on("connection", (socket) => {
+    console.log("New client connected");
+    const response = new Date();
+    // Emitting a new message. Will be consumed by the client
+    socket.emit("FromAPI", response);
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+    });
+});
+
+server.listen(config.api.port, () => {
     console.log(`Conectado al puesto ${config.api.port}`)
-})
+});

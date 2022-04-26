@@ -1,11 +1,6 @@
 const TABLA = 'chq_bol_rangos'
 const TABLA2 = 'chq_bol_disp'
-const functions = require("./functions")
 const customQuerys = require("./customQuery")
-const path = require('path')
-const getPages = require('../../../utils/getPages')
-const moment = require('moment')
-const prestaController = require('../prestadores')
 
 module.exports = (injectedStore) => {
     let store = injectedStore
@@ -27,7 +22,7 @@ module.exports = (injectedStore) => {
                 const respuesta = await store.update(TABLA, newTal)
                 const affected = parseInt(respuesta.affectedRows)
                 if (affected > 0) {
-                    newTalDisp(newTal, true)
+                    return newTalDisp(newTal, true)
                 } else {
                     throw new Error("Error desconocido")
                 }
@@ -35,7 +30,7 @@ module.exports = (injectedStore) => {
                 const respuesta = await store.insert(TABLA, newTal)
                 const affected = parseInt(respuesta.affectedRows)
                 if (affected > 0) {
-                    newTalDisp(newTal, false)
+                    return newTalDisp(newTal, false)
                 } else {
                     throw new Error("Error desconocido")
                 }
@@ -83,7 +78,9 @@ module.exports = (injectedStore) => {
     }
 
     const removeRange = async (id) => {
+        console.log('id :>> ', id);
         const dataRange = await store.get(TABLA, id)
+        console.log('dataRange :>> ', dataRange);
         if (dataRange.length > 0) {
             const respuesta = await store.remove(TABLA, { id: id })
             const affected = parseInt(respuesta.affectedRows)
@@ -102,15 +99,21 @@ module.exports = (injectedStore) => {
         if (dataRange.length > 0) {
             const query = ` SELECT COUNT(*) as count FROM ${TABLA2} WHERE nro >= ? AND nro <= ? AND tipo = ? `
             const cantPend = await store.customQuery(query, [dataRange[0].desde, dataRange[0].hasta, dataRange[0].tipo])
-            if (cantPend[0] > 0) {
-                return 0
+            if (cantPend[0].count > 0) {
+                return {
+                    completo: 0,
+                    cantPend: cantPend[0].count
+                }
             } else {
                 const data = {
                     id: id,
                     completo: 1
                 }
                 await store.update(TABLA, data)
-                return 1
+                return {
+                    completo: 1,
+                    cantPend: 0
+                }
             }
         } else {
             throw new Error("Error desconocido")
@@ -120,15 +123,16 @@ module.exports = (injectedStore) => {
     const listaTalPend = async () => {
         const query = ` SELECT * FROM ${TABLA} WHERE completo = '0' ORDER BY tipo, desde `
         const listaIncompleta = await store.customQuery(query)
-        console.log(`listaIncompleta`, listaIncompleta)
         let listadoBol = []
         let listadoChq = []
+        const sigCbtes = await siguienteUso()
         return new Promise((resolve, reject) => {
             if (listaIncompleta.length > 0) {
                 listaIncompleta.map(async (item, key) => {
                     const completo = await verificaTal(item.id)
-                    item.completo = completo
-                    if (item.tipo === 1) {
+                    item.completo = completo.completo
+                    item.cantPend = completo.cantPend
+                    if (parseInt(item.tipo) === 0) {
                         listadoChq.push(item)
                     } else {
                         listadoBol.push(item)
@@ -136,7 +140,8 @@ module.exports = (injectedStore) => {
                     if (key === (listaIncompleta.length - 1)) {
                         resolve({
                             listadoChq,
-                            listadoBol
+                            listadoBol,
+                            sigCbtes
                         })
                     }
                 })
@@ -146,16 +151,59 @@ module.exports = (injectedStore) => {
         })
     }
 
-    const TalPendientes = async () => {
-        const sqlChq = ` SELECT COUNT(*) FROM ${TABLA2} WHERE tipo = '0' `
-        const sqlBol = ` SELECT COUNT(*) FROM ${TABLA2} WHERE tipo = '1' `
+    const siguienteUso = async (lastBol, lastChq) => {
+        let query1 = ` SELECT MIN(nro) as sigChq FROM ${TABLA2} WHERE tipo = '0' `
+        let query2 = ` SELECT MIN(nro) as sigBol FROM ${TABLA2} WHERE tipo = '1' `
 
+        if (lastChq) {
+            query1 = ` SELECT MIN(nro) as sigChq FROM ${TABLA2} WHERE tipo = '0' AND nro > ${lastChq} `
+        }
+        if (lastBol) {
+            query2 = ` SELECT MIN(nro) as sigBol FROM ${TABLA2} WHERE tipo = '1' AND nro > ${lastBol}  `
+        }
+
+        const listaSigChq = await store.customQuery(query1)
+        const listaSigBol = await store.customQuery(query2)
+
+        let sigChq = 0
+        let sigBol = 0
+
+        if (listaSigChq.length > 0) {
+            sigChq = listaSigChq[0].sigChq
+            if (sigChq === null) {
+                sigChq = 0
+            }
+        }
+
+        if (listaSigBol.length > 0) {
+            sigBol = listaSigBol[0].sigBol
+            if (sigBol === null) {
+                sigBol = 0
+            }
+        }
+
+        return {
+            sigChq,
+            sigBol
+        }
+    }
+
+    const verificaNro = async (tipo, numero) => {
+        const sql = ` SELECT COUNT(*) as cant FROM ${TABLA2} WHERE tipo = '${tipo}' AND nro = '${numero}' `
+        const cant = await store.customQuery(sql)
+        if (isNaN(cant[0].cant)) {
+            return 0
+        } else {
+            return cant[0].cant
+        }
     }
 
     return {
         talonarioUpsert,
         removeRange,
         verificaTal,
-        listaTalPend
+        listaTalPend,
+        siguienteUso,
+        verificaNro
     }
 }
