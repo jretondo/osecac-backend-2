@@ -60,6 +60,54 @@ module.exports = (injectedStore) => {
         return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
     }
 
+    const replaceImp = async (fileName, idUser) => {
+        const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
+        const conscepts = await store.customQuery(`SELECT desc_extracto AS descripcion FROM tipos_movimientos WHERE orden >= 7`)
+        const concepts2 = conscepts.map(item => item.descripcion)
+        //console.log('concepts2 :>> ', concepts2);
+        const filtered = dataSheet.filter(function (item) {
+            if (item.__EMPTY_1) {
+                return concepts2.indexOf(item.__EMPTY_1) !== -1;
+            }
+        });
+        console.log('filtered :>> ', filtered);
+        const queryValues = await Promise.all(
+            dataSheet.map(async (fila) => {
+                const nroCbte = fila.__EMPTY_4
+                const verificInt = parseInt(nroCbte)
+                const esNulo = isNaN(verificInt)
+                let fechaAnt = "";
+                if (!esNulo) {
+                    const fecha = functions.transformToDate(fila.__EMPTY);
+                    if (fechaAnt !== fecha) {
+                        await store.customQuery(`DELETE FROM extractos_bco_cba WHERE id_tipo >= 7 and fecha = '${fecha}'`)
+                    }
+
+                    const concepto = fila.__EMPTY_1
+                    let smallConcepto = concepto.slice(0, 13)
+                    smallConcepto = "%" + smallConcepto + "%"
+                    let descripcion = fila.__EMPTY_2
+                    if (descripcion === undefined) {
+                        descripcion = ""
+                    }
+                    const monto = functions.transformToMoney(fila.__EMPTY_3)
+                    let credito
+                    if (monto < 0) {
+                        credito = 1
+                    } else {
+                        credito = 0
+                    }
+
+                    fechaAnt = fecha
+                    return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                } else {
+                    return ""
+                }
+            })
+        )
+        return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+    }
+
     const getByDate = async (date) => {
         return await store.customQuery(customQuerys.getByDate(TABLA, date))
     }
@@ -229,6 +277,7 @@ module.exports = (injectedStore) => {
 
     return {
         process,
+        replaceImp,
         remove,
         list,
         download,

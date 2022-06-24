@@ -16,6 +16,14 @@ const process = (req, res, next) => {
         .catch(next)
 }
 
+const replaceImp = (req, res, next) => {
+    Controller.replaceImp(req.files[0].fieldname, req.user.id)
+        .then(() => {
+            response.success(req, res, 201, "Extracto procesado")
+        })
+        .catch(next)
+}
+
 const remove = (req, res, next) => {
     Controller.remove({ fecha: req.params.fecha })
         .then(() => {
@@ -106,6 +114,7 @@ const listTiposMov = async (req, res, next) => {
 
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
+router.post("/replaceImp", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), replaceImp)
 router.put("/:id", secure(3), update)
 router.patch("/:id", secure(3), updateCustom)
 router.delete("/removeId/:id", secure(3), removeOne)
