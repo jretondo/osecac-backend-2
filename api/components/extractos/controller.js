@@ -70,7 +70,7 @@ module.exports = (injectedStore) => {
                 return concepts2.indexOf(item.__EMPTY_1) !== -1;
             }
         });
-        console.log('filtered :>> ', filtered);
+
         const queryValues = await Promise.all(
             dataSheet.map(async (fila) => {
                 const nroCbte = fila.__EMPTY_4
@@ -136,14 +136,18 @@ module.exports = (injectedStore) => {
         const fechaIni = moment(datosIniciales[0].fechaAnt, "YYYY-MM-DD").format("DD/MM/YYYY")
         let gastos = await store.customQuery(customQuerys.totalGastos(desde, hasta))
         gastos = formatMoney(- gastos[0].gastos)
+        let sicreb = await store.customQuery(customQuerys.totalSicreb(desde, hasta))
+        sicreb = formatMoney(- sicreb[0].sicreb)
         let impuestos = await store.customQuery(customQuerys.totalImpuestos(desde, hasta))
         impuestos = formatMoney(- impuestos[0].impuestos)
         const listaMovRaw = await store.customQuery(customQuerys.movimientosBco(desde, hasta))
         const listaMov = await functions.listaMovExtracto(listaMovRaw, saldoinicial)
+        console.log('sicreb :>> ', sicreb);
         const datosRender = {
             desde: desdeStr,
             hasta: hastaStr,
             gastos,
+            sicreb,
             impuestos,
             saldoInicial: saldoIniStr,
             fechaIni,

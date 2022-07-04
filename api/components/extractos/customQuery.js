@@ -70,6 +70,10 @@ const totalImpuestos = (desde, hasta) => {
     return ` SELECT SUM(monto) AS impuestos FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND (id_tipo = 8 OR id_tipo = 9) `
 }
 
+const totalSicreb = (desde, hasta) => {
+    return ` SELECT SUM(monto) AS sicreb FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = 10 `
+}
+
 const detalleDia = (table, fecha) => {
     return ` SELECT * FROM ${table} WHERE fecha = '${fecha}' `
 }
@@ -100,5 +104,6 @@ module.exports = {
     getWithOut,
     typeMovGroup,
     cantMov2,
-    getByDate
+    getByDate,
+    totalSicreb
 }
