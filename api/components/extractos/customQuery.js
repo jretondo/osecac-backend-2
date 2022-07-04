@@ -71,7 +71,7 @@ const totalImpuestos = (desde, hasta) => {
 }
 
 const totalSicreb = (desde, hasta) => {
-    return ` SELECT SUM(monto) AS sicreb FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = 10 `
+    return ` SELECT SUM(monto) AS sircreb FROM extractos_bco_cba WHERE fecha >= '${desde}' AND fecha <= '${hasta}' AND id_tipo = 10 `
 }
 
 const detalleDia = (table, fecha) => {

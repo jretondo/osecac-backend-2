@@ -136,18 +136,18 @@ module.exports = (injectedStore) => {
         const fechaIni = moment(datosIniciales[0].fechaAnt, "YYYY-MM-DD").format("DD/MM/YYYY")
         let gastos = await store.customQuery(customQuerys.totalGastos(desde, hasta))
         gastos = formatMoney(- gastos[0].gastos)
-        let sicreb = await store.customQuery(customQuerys.totalSicreb(desde, hasta))
-        sicreb = formatMoney(- sicreb[0].sicreb)
+        let sircreb = await store.customQuery(customQuerys.totalSicreb(desde, hasta))
+        sircreb = formatMoney(- sircreb[0].sircreb)
         let impuestos = await store.customQuery(customQuerys.totalImpuestos(desde, hasta))
         impuestos = formatMoney(- impuestos[0].impuestos)
         const listaMovRaw = await store.customQuery(customQuerys.movimientosBco(desde, hasta))
         const listaMov = await functions.listaMovExtracto(listaMovRaw, saldoinicial)
-        console.log('sicreb :>> ', sicreb);
+        console.log('sicreb :>> ', sircreb);
         const datosRender = {
             desde: desdeStr,
             hasta: hastaStr,
             gastos,
-            sicreb,
+            sircreb,
             impuestos,
             saldoInicial: saldoIniStr,
             fechaIni,
