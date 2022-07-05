@@ -142,7 +142,7 @@ module.exports = (injectedStore) => {
         impuestos = formatMoney(- impuestos[0].impuestos)
         const listaMovRaw = await store.customQuery(customQuerys.movimientosBco(desde, hasta))
         const listaMov = await functions.listaMovExtracto(listaMovRaw, saldoinicial)
-        console.log('sicreb :>> ', sircreb);
+
         const datosRender = {
             desde: desdeStr,
             hasta: hastaStr,
@@ -255,12 +255,15 @@ module.exports = (injectedStore) => {
         const hastaStr = moment(hasta, "YYYY-MM-DD").format("YYYY-MM-DD")
         let gastos = await store.customQuery(customQuerys.totalGastos(desdeStr, hastaStr))
         gastos = formatMoney(- gastos[0].gastos)
+        let sircreb = await store.customQuery(customQuerys.totalSicreb(desde, hasta))
+        sircreb = formatMoney(- sircreb[0].sircreb)
         let impuestos = await store.customQuery(customQuerys.totalImpuestos(desdeStr, hastaStr))
         impuestos = formatMoney(- impuestos[0].impuestos)
 
         return {
             gastos,
-            impuestos
+            impuestos,
+            sircreb
         }
     }
 
