@@ -18,6 +18,7 @@ module.exports = (injectedStore) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
         const queryValues = await Promise.all(
             dataSheet.map(async (fila) => {
+                console.log('fila :>> ', fila);
                 const nroCbte = fila.__EMPTY_4
                 const verificInt = parseInt(nroCbte)
                 const esNulo = isNaN(verificInt)
