@@ -1,14 +1,40 @@
+var moment = require('moment');
+
 const insertNewMov = (table, values) => {
-    let query = ` INSERT INTO ${table} (fecha,  concepto, nro_cbte, monto, id_tipo, cr_deb, conciliado, id_libro, id_usu, saldo_ini, descripcion) VALUES ${values} `
+    let query = ` INSERT INTO ${table} (fecha, concepto, nro_cbte, monto, id_tipo, cr_deb, conciliado, id_libro, id_usu, saldo_ini, descripcion) VALUES ${values} `
     query = query.replace(/,,,/g, "")
     query = query.replace(/,,/g, "")
+    query = query.replace("VALUES ,", "VALUES ")
     query = query.trimEnd()
     query = query.slice(0, parseInt(query.length) - 1)
     return query
 }
 
+const insertNewMov2 = (table, values) => {
+    let query = ` INSERT INTO ${table} (fecha, concepto, nro_cbte, monto, id_tipo, cr_deb, conciliado, id_libro, id_usu, saldo_ini, descripcion) VALUES ${values} `
+    query = query.replace(/,,,/g, "")
+    query = query.replace(/,,/g, "")
+    query = query.replace("VALUES ,", "VALUES ")
+    query = query.trimEnd()
+    //query = query.slice(0, parseInt(query.length) - 1)
+    return query
+}
+
 const singleValueNewMov = (tableTMov, fecha, concepto, nroCbte, valor, smConcepto, credito, idUsu, descripcion) => {
     return ` ('${fecha}', '${concepto}', '${nroCbte}', '${valor}', (SELECT orden as Ord FROM ${tableTMov} WHERE desc_extracto LIKE '${smConcepto}' LIMIT 1), ${credito}, '0', '0', ${idUsu}, '0', '${descripcion}') `
+}
+
+const singleValueNewMov2 = (tableTMov, fecha, concepto, nroCbte, valor, smConcepto, credito, idUsu, descripcion) => {
+    const secondsInDay = 24 * 60 * 60;
+    const excelEpoch = new Date(1899, 11, 31);
+    const excelEpochAsUnixTimestamp = excelEpoch.getTime();
+    const missingLeapYearDay = secondsInDay * 1000;
+    const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
+    const excelTimestampAsUnixTimestamp = fecha * secondsInDay * 1000;
+    const parsed = excelTimestampAsUnixTimestamp + delta;
+    const newDte = moment(parsed).format("YYYY-MM-DD")
+
+    return ` ('${newDte}', '${concepto}', '${nroCbte}', '${valor}', (SELECT orden as Ord FROM ${tableTMov} WHERE desc_extracto LIKE '${smConcepto}' LIMIT 1), ${credito}, '0', '0', ${idUsu}, '0', '${descripcion}') `
 }
 
 const listExtractos = (desde, hasta, pagAct) => {
@@ -90,6 +116,18 @@ const getByDate = (table, date) => {
     return ` SELECT COUNT(*) as cant FROM ${table} WHERE fecha = '${date}' `
 }
 
+const getByDate2 = (table, date) => {
+    const secondsInDay = 24 * 60 * 60;
+    const excelEpoch = new Date(1899, 11, 31);
+    const excelEpochAsUnixTimestamp = excelEpoch.getTime();
+    const missingLeapYearDay = secondsInDay * 1000;
+    const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
+    const excelTimestampAsUnixTimestamp = date * secondsInDay * 1000;
+    const parsed = excelTimestampAsUnixTimestamp + delta;
+    const newDte = moment(parsed).format("YYYY-MM-DD")
+    return ` SELECT COUNT(*) as cant FROM ${table} WHERE fecha = '${newDte}' `
+}
+
 module.exports = {
     insertNewMov,
     singleValueNewMov,
@@ -105,5 +143,8 @@ module.exports = {
     typeMovGroup,
     cantMov2,
     getByDate,
-    totalSicreb
+    totalSicreb,
+    singleValueNewMov2,
+    getByDate2,
+    insertNewMov2
 }

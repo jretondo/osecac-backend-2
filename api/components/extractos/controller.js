@@ -18,7 +18,6 @@ module.exports = (injectedStore) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
         const queryValues = await Promise.all(
             dataSheet.map(async (fila) => {
-                console.log('fila :>> ', fila);
                 const nroCbte = fila.__EMPTY_4
                 const verificInt = parseInt(nroCbte)
                 const esNulo = isNaN(verificInt)
@@ -59,6 +58,48 @@ module.exports = (injectedStore) => {
             })
         )
         return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+    }
+
+    const process1 = async (fileName, idUser) => {
+        const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
+        const queryValues = await Promise.all(
+            dataSheet.map(async (fila) => {
+                const nroCbte = fila.__EMPTY_2
+                const verificInt = parseInt(nroCbte)
+                const esNulo = isNaN(verificInt)
+                let fechaFalsa = false;
+                let fechaAnt = "";
+                if (!esNulo) {
+                    const fecha = (fila.__EMPTY);
+                    if (!fechaFalsa || fechaAnt !== fecha) {
+                        const cantRegByDate = await getByDate(fecha);
+                        if (cantRegByDate[0].cant === 0) {
+                            fechaFalsa = false;
+                            const concepto = fila.__EMPTY_3.trim()
+                            let smallConcepto = concepto.slice(0, 13)
+                            smallConcepto = "%" + smallConcepto + "%"
+                            let descripcion = ""
+                            if (descripcion === undefined) {
+                                descripcion = ""
+                            }
+                            const monto = functions.transformToMoney(fila.__EMPTY_1)
+                            let credito
+                            if (monto < 0) {
+                                credito = 1
+                            } else {
+                                credito = 0
+                            }
+                            return customQuerys.singleValueNewMov2(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                        } else {
+                            fechaFalsa = true
+                            //return ""
+                        }
+                    }
+                }
+            })
+        )
+
+        return await store.customQuery(customQuerys.insertNewMov2(TABLA, queryValues))
     }
 
     const replaceImp = async (fileName, idUser) => {
@@ -110,7 +151,7 @@ module.exports = (injectedStore) => {
     }
 
     const getByDate = async (date) => {
-        return await store.customQuery(customQuerys.getByDate(TABLA, date))
+        return await store.customQuery(customQuerys.getByDate2(TABLA, date))
     }
 
     const remove = (query) => {
@@ -298,6 +339,7 @@ module.exports = (injectedStore) => {
         listWithOut,
         update,
         listTiposMov,
-        getMovimientos2
+        getMovimientos2,
+        process1
     }
 }

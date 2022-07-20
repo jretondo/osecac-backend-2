@@ -16,6 +16,14 @@ const process = (req, res, next) => {
         .catch(next)
 }
 
+const process1 = (req, res, next) => {
+    Controller.process1(req.files[0].fieldname, req.user.id)
+        .then(() => {
+            response.success(req, res, 201, "Extracto procesado")
+        })
+        .catch(next)
+}
+
 const replaceImp = (req, res, next) => {
     Controller.replaceImp(req.files[0].fieldname, req.user.id)
         .then(() => {
@@ -114,6 +122,7 @@ const listTiposMov = async (req, res, next) => {
 
 //Routes
 router.post("/process", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process)
+router.post("/process1", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), process1)
 router.post("/replaceImp", secure(3), uploadFile(path.join("Archivos", "Extractos-Excel")), replaceImp)
 router.put("/:id", secure(3), update)
 router.patch("/:id", secure(3), updateCustom)
