@@ -6,7 +6,8 @@ const insertNewMov = (table, values) => {
     query = query.replace(/,,/g, "")
     query = query.replace("VALUES ,", "VALUES ")
     query = query.trimEnd()
-    query = query.slice(0, parseInt(query.length) - 1)
+    //query = query.slice(0, parseInt(query.length) - 1)
+
     return query
 }
 

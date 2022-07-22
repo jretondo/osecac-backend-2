@@ -10,7 +10,6 @@ const getDataSheet = (fileUrl) => {
     const workBook = XLSX.readFile(fileUrl)
     const sheets = workBook.SheetNames;
     const hoja1 = sheets[0]
-    console.log('hoja1 :>> ', hoja1);
     return XLSX.utils.sheet_to_json(workBook.Sheets[hoja1])
 }
 
@@ -38,11 +37,10 @@ const transformToDate = (rawDate) => {
 
     fecha = anio + "-" + mes + "-" + dia
     fecha = moment(fecha, "YYYY-MM-DD").format("YYYY-MM-DD")
-    console.log('fecha :>> ', fecha);
     return fecha
 }
 
-const transformToMoney = (rawNumber) => {
+const transformToMoney = (rawNumber) => {   
     let valor = rawNumber
     valor = valor.replace("$", "")
     valor = valor.split(".").join("")

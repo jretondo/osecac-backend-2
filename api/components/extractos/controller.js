@@ -76,7 +76,7 @@ module.exports = (injectedStore) => {
                         if (cantRegByDate[0].cant === 0) {
                             fechaFalsa = false;
                             const concepto = fila.__EMPTY_3.trim()
-                            let smallConcepto = concepto.slice(0, 13)
+                            let smallConcepto = concepto.slice(0, 10)
                             smallConcepto = "%" + smallConcepto + "%"
                             let descripcion = ""
                             if (descripcion === undefined) {
@@ -102,11 +102,60 @@ module.exports = (injectedStore) => {
         return await store.customQuery(customQuerys.insertNewMov2(TABLA, queryValues))
     }
 
+    const process3 = async (fileName, idUser) => {
+        const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
+
+        const queryValues = await Promise.all(
+            dataSheet.map(async (fila) => {
+                const nroCbte = fila.Nro_Comprobante
+                const verificInt = parseInt(nroCbte)
+                const esNulo = isNaN(verificInt)
+                let fechaFalsa = false;
+                let fechaAnt = "";
+                if (!esNulo) {
+                    const fecha = functions.transformToDate(fila.Fecha);
+                    if (!fechaFalsa || fechaAnt !== fecha) {
+                        const cantRegByDate = await getByDate(fecha);
+                        if (cantRegByDate[0].cant === 0) {
+                            fechaFalsa = false;
+                            const concepto = fila.Concepto
+                            let smallConcepto = concepto.slice(0, 13)
+                            smallConcepto = "%" + smallConcepto + "%"
+                            let descripcion = fila.Descripcion
+                            if (descripcion === undefined) {
+                                descripcion = ""
+                            }
+
+                            const monto = fila.Monto
+                            console.log('monto :>> ', monto);
+                            let credito
+                            if (monto < 0) {
+                                credito = 1
+                            } else {
+                                credito = 0
+                            }
+                            return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                        } else {
+                            fechaFalsa = true
+                            return ""
+                        }
+                    } else {
+                        return ""
+                    }
+                    fechaAnt = fecha
+                } else {
+                    return ""
+                }
+            })
+        )
+
+        return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+    }
+
     const replaceImp = async (fileName, idUser) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
         const conscepts = await store.customQuery(`SELECT desc_extracto AS descripcion FROM tipos_movimientos WHERE orden >= 7`)
         const concepts2 = conscepts.map(item => item.descripcion)
-        //console.log('concepts2 :>> ', concepts2);
         const filtered = dataSheet.filter(function (item) {
             if (item.__EMPTY_1) {
                 return concepts2.indexOf(item.__EMPTY_1) !== -1;
@@ -151,7 +200,7 @@ module.exports = (injectedStore) => {
     }
 
     const getByDate = async (date) => {
-        return await store.customQuery(customQuerys.getByDate2(TABLA, date))
+        return await store.customQuery(customQuerys.getByDate(TABLA, date))
     }
 
     const remove = (query) => {
@@ -340,6 +389,7 @@ module.exports = (injectedStore) => {
         update,
         listTiposMov,
         getMovimientos2,
-        process1
+        process1,
+        process3
     }
 }

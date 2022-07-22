@@ -9,7 +9,7 @@ const config = require("../../../config")
 
 //internal Functions
 const process = (req, res, next) => {
-    Controller.process(req.files[0].fieldname, req.user.id)
+    Controller.process3(req.files[0].fieldname, req.user.id)
         .then(() => {
             response.success(req, res, 201, "Extracto procesado")
         })
