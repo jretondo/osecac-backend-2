@@ -14,6 +14,16 @@ module.exports = (injectedStore) => {
         store = require('../../../store/dummy')
     }
 
+    const processDef = async (fileName, idUser) => {
+        const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
+        const queryValues = await Promise.all(
+            dataSheet.map(async (fila) => {
+
+            })
+        )
+        return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+    }
+
     const process = async (fileName, idUser) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
         const queryValues = await Promise.all(
@@ -113,21 +123,22 @@ module.exports = (injectedStore) => {
                 let fechaFalsa = false;
                 let fechaAnt = "";
                 if (!esNulo) {
-                    const fecha = functions.transformToDate(fila.Fecha);
+                    const fecha = functions.transformToDate2(fila.Fecha);
                     if (!fechaFalsa || fechaAnt !== fecha) {
                         const cantRegByDate = await getByDate(fecha);
                         if (cantRegByDate[0].cant === 0) {
                             fechaFalsa = false;
-                            const concepto = fila.Concepto
+                            const concepto = fila.Concepto.trim()
                             let smallConcepto = concepto.slice(0, 13)
                             smallConcepto = "%" + smallConcepto + "%"
                             let descripcion = fila.Descripcion
                             if (descripcion === undefined) {
                                 descripcion = ""
+                            } else {
+                                descripcion = descripcion.trim()
                             }
 
                             const monto = fila.Monto
-                            console.log('monto :>> ', monto);
                             let credito
                             if (monto < 0) {
                                 credito = 1
@@ -390,6 +401,7 @@ module.exports = (injectedStore) => {
         listTiposMov,
         getMovimientos2,
         process1,
-        process3
+        process3,
+        processDef
     }
 }

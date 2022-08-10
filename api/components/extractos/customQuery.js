@@ -6,8 +6,12 @@ const insertNewMov = (table, values) => {
     query = query.replace(/,,/g, "")
     query = query.replace("VALUES ,", "VALUES ")
     query = query.trimEnd()
+    //console.log('query :>> ', query);
+    const ultStr = query.substring(query.length - 1)
     //query = query.slice(0, parseInt(query.length) - 1)
-
+    if (ultStr === ",") {
+        query = query.slice(0, parseInt(query.length) - 1)
+    }
     return query
 }
 
@@ -34,7 +38,7 @@ const singleValueNewMov2 = (tableTMov, fecha, concepto, nroCbte, valor, smConcep
     const excelTimestampAsUnixTimestamp = fecha * secondsInDay * 1000;
     const parsed = excelTimestampAsUnixTimestamp + delta;
     const newDte = moment(parsed).format("YYYY-MM-DD")
-
+    console.log('newDte :>> ', newDte);
     return ` ('${newDte}', '${concepto}', '${nroCbte}', '${valor}', (SELECT orden as Ord FROM ${tableTMov} WHERE desc_extracto LIKE '${smConcepto}' LIMIT 1), ${credito}, '0', '0', ${idUsu}, '0', '${descripcion}') `
 }
 

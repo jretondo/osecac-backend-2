@@ -40,7 +40,19 @@ const transformToDate = (rawDate) => {
     return fecha
 }
 
-const transformToMoney = (rawNumber) => {   
+const transformToDate2 = (date) => {
+    const secondsInDay = 24 * 60 * 60;
+    const excelEpoch = new Date(1899, 11, 31);
+    const excelEpochAsUnixTimestamp = excelEpoch.getTime();
+    const missingLeapYearDay = secondsInDay * 1000;
+    const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
+    const excelTimestampAsUnixTimestamp = date * secondsInDay * 1000;
+    const parsed = excelTimestampAsUnixTimestamp + delta;
+    const newDte = moment(parsed).format("YYYY-DD-MM")
+    return newDte
+}
+
+const transformToMoney = (rawNumber) => {
     let valor = rawNumber
     valor = valor.replace("$", "")
     valor = valor.split(".").join("")
@@ -113,5 +125,6 @@ module.exports = {
     transformToDate,
     transformToMoney,
     listaMovExtracto,
-    renderReport
+    renderReport,
+    transformToDate2
 }
