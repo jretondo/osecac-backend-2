@@ -12,6 +12,7 @@ const insertNewMov = (table, values) => {
     if (ultStr === ",") {
         query = query.slice(0, parseInt(query.length) - 1)
     }
+    //console.log('query :>> ', query);
     return query
 }
 

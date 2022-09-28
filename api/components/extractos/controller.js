@@ -114,19 +114,50 @@ module.exports = (injectedStore) => {
 
     const process3 = async (fileName, idUser) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
-
+        let fechaFalsa = false;
+        let fechaAnt = "";
         const queryValues = await Promise.all(
             dataSheet.map(async (fila) => {
+
                 const nroCbte = fila.Nro_Comprobante
                 const verificInt = parseInt(nroCbte)
                 const esNulo = isNaN(verificInt)
-                let fechaFalsa = false;
-                let fechaAnt = "";
+
                 if (!esNulo) {
-                    const fecha = functions.transformToDate2(fila.Fecha);
-                    if (!fechaFalsa || fechaAnt !== fecha) {
-                        const cantRegByDate = await getByDate(fecha);
-                        if (cantRegByDate[0].cant === 0) {
+                    let fecha = functions.transformToDate2(fila.Fecha);
+                    if (fecha === "Invalid date") {
+                        fecha = functions.transformToDate(fila.Fecha);
+                    }
+                    if (!fechaFalsa) {
+                        if (fechaAnt !== fecha) {
+                            fechaAnt = fecha
+                            const cantRegByDate = await getByDate(fecha);
+                            if (cantRegByDate[0].cant === 0) {
+                                fechaFalsa = false;
+                                const concepto = fila.Concepto.trim()
+                                let smallConcepto = concepto.slice(0, 13)
+                                smallConcepto = "%" + smallConcepto + "%"
+                                let descripcion = fila.Descripcion
+                                if (descripcion === undefined) {
+                                    descripcion = ""
+                                } else {
+                                    descripcion = descripcion.trim()
+                                }
+
+                                const monto = fila.Monto
+                                let credito
+                                if (monto < 0) {
+                                    credito = 1
+                                } else {
+                                    credito = 0
+                                }
+
+                                return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
+                            } else {
+                                fechaFalsa = true
+                                return ""
+                            }
+                        } else {
                             fechaFalsa = false;
                             const concepto = fila.Concepto.trim()
                             let smallConcepto = concepto.slice(0, 13)
@@ -145,22 +176,33 @@ module.exports = (injectedStore) => {
                             } else {
                                 credito = 0
                             }
+
                             return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, nroCbte, monto, smallConcepto, credito, idUser, descripcion)
-                        } else {
-                            fechaFalsa = true
-                            return ""
                         }
                     } else {
-                        return ""
+                        //return ""
                     }
-                    fechaAnt = fecha
                 } else {
-                    return ""
+                    //return ""
                 }
             })
         )
 
         return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
+
+
+        /* 
+
+ console.log('dataSheet :>> ', dataSheet);
+
+        const data = dataSheet[2][4]
+        const data2 = data + 1
+        console.log('data :>> ', data);
+
+       
+        */
+
+        return ""
     }
 
     const replaceImp = async (fileName, idUser) => {
