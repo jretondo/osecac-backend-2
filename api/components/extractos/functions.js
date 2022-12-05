@@ -10,7 +10,7 @@ const getDataSheet = (fileUrl) => {
     const workBook = XLSX.readFile(fileUrl)
     const sheets = workBook.SheetNames;
     const hoja1 = sheets[0]
-    return XLSX.utils.sheet_to_json(workBook.Sheets[hoja1])
+    return XLSX.utils.sheet_to_json(workBook.Sheets[hoja1], { header: 1 })
 }
 
 const transformToDate = (rawDate) => {
@@ -48,7 +48,7 @@ const transformToDate2 = (date) => {
     const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
     const excelTimestampAsUnixTimestamp = date * secondsInDay * 1000;
     const parsed = excelTimestampAsUnixTimestamp + delta;
-    const newDte = moment(parsed).format("YYYY-DD-MM")
+    const newDte = moment(parsed).format("YYYY-MM-DD")
     return newDte
 }
 

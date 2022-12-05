@@ -74,13 +74,17 @@ module.exports = (injectedStore) => {
         const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
         const queryValues = await Promise.all(
             dataSheet.map(async (fila) => {
+                console.log('fila :>> ', fila);
                 const nroCbte = fila.__EMPTY_2
                 const verificInt = parseInt(nroCbte)
                 const esNulo = isNaN(verificInt)
                 let fechaFalsa = false;
                 let fechaAnt = "";
                 if (!esNulo) {
-                    const fecha = (fila.__EMPTY);
+                    let fecha = functions.transformToDate2(fila.__EMPTY);
+                    if (fecha === "Invalid date") {
+                        fecha = functions.transformToDate(fila.__EMPTY);
+                    }
                     if (!fechaFalsa || fechaAnt !== fecha) {
                         const cantRegByDate = await getByDate(fecha);
                         if (cantRegByDate[0].cant === 0) {
@@ -92,7 +96,7 @@ module.exports = (injectedStore) => {
                             if (descripcion === undefined) {
                                 descripcion = ""
                             }
-                            const monto = functions.transformToMoney(fila.__EMPTY_1)
+                            const monto = fila.__EMPTY_1
                             let credito
                             if (monto < 0) {
                                 credito = 1
@@ -192,17 +196,70 @@ module.exports = (injectedStore) => {
 
 
         /* 
-
- console.log('dataSheet :>> ', dataSheet);
-
-        const data = dataSheet[2][4]
-        const data2 = data + 1
-        console.log('data :>> ', data);
-
-       
+            console.log('dataSheet :>> ', dataSheet);
+            const data = dataSheet[2][4]
+            const data2 = data + 1
+            console.log('data :>> ', data);       
         */
 
         return ""
+    }
+
+    const process4 = async (fileName, idUser) => {
+        const dataSheet = functions.getDataSheet(path.join("Archivos", "Extractos-Excel", fileName))
+        let fechaFalsa = false;
+        let fechaAnt = "";
+        const queryValues = await Promise.all(
+            dataSheet.map(async (fila, key) => {
+                const comprobante = fila[1]
+                const verificInt = parseInt(comprobante)
+                const esNulo = isNaN(verificInt)
+
+                if (!esNulo) {
+                    let fecha = functions.transformToDate2(fila[0]);
+                    if (fecha === "Invalid date") {
+                        fecha = functions.transformToDate(fila[0]);
+                    }
+                    const concepto = fila[2].trim()
+                    const descripcion = fila[3].trim()
+                    const monto = fila[4]
+                    console.log('fecha :>> ', fecha);
+                    console.log('fechaAnt :>> ', fechaAnt);
+                    if (fechaAnt !== fecha) {
+                        console.log('key :>> ', key);
+                        fechaAnt = fecha
+                        const cantRegByDate = await getByDate(fecha)
+                        console.log('cantRegByDate[0].cant :>> ', cantRegByDate[0].cant);
+                        if (cantRegByDate[0].cant === 0) {
+                            fechaFalsa = false;
+                            let smallConcepto = concepto.slice(0, 13)
+                            smallConcepto = "%" + smallConcepto + "%"
+
+                            let credito = 0
+                            if (monto < 0) {
+                                credito = 1
+                            }
+
+                            return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, comprobante, monto, smallConcepto, credito, idUser, descripcion)
+                        } else {
+                            fechaFalsa = true
+                        }
+                    } else if (!fechaFalsa) {
+                        let smallConcepto = concepto.slice(0, 13)
+                        smallConcepto = "%" + smallConcepto + "%"
+
+                        let credito = 0
+                        if (monto < 0) {
+                            credito = 1
+                        }
+
+                        return customQuerys.singleValueNewMov(TABLA2, fecha, concepto, comprobante, monto, smallConcepto, credito, idUser, descripcion)
+                    }
+
+                }
+            })
+        )
+        return await store.customQuery(customQuerys.insertNewMov(TABLA, queryValues))
     }
 
     const replaceImp = async (fileName, idUser) => {
@@ -253,7 +310,9 @@ module.exports = (injectedStore) => {
     }
 
     const getByDate = async (date) => {
-        return await store.customQuery(customQuerys.getByDate(TABLA, date))
+        return await new Promise((resolve, reject) => {
+            resolve(store.customQuery(customQuerys.getByDate(TABLA, date)))
+        })
     }
 
     const remove = (query) => {
@@ -444,6 +503,7 @@ module.exports = (injectedStore) => {
         getMovimientos2,
         process1,
         process3,
+        process4,
         processDef
     }
 }

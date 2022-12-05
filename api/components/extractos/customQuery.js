@@ -12,7 +12,7 @@ const insertNewMov = (table, values) => {
     if (ultStr === ",") {
         query = query.slice(0, parseInt(query.length) - 1)
     }
-    //console.log('query :>> ', query);
+    console.log('query :>> ', query);
     return query
 }
 
@@ -22,6 +22,7 @@ const insertNewMov2 = (table, values) => {
     query = query.replace(/,,/g, "")
     query = query.replace("VALUES ,", "VALUES ")
     query = query.trimEnd()
+    console.log('query :>> ', query);
     //query = query.slice(0, parseInt(query.length) - 1)
     return query
 }
@@ -31,16 +32,8 @@ const singleValueNewMov = (tableTMov, fecha, concepto, nroCbte, valor, smConcept
 }
 
 const singleValueNewMov2 = (tableTMov, fecha, concepto, nroCbte, valor, smConcepto, credito, idUsu, descripcion) => {
-    const secondsInDay = 24 * 60 * 60;
-    const excelEpoch = new Date(1899, 11, 31);
-    const excelEpochAsUnixTimestamp = excelEpoch.getTime();
-    const missingLeapYearDay = secondsInDay * 1000;
-    const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
-    const excelTimestampAsUnixTimestamp = fecha * secondsInDay * 1000;
-    const parsed = excelTimestampAsUnixTimestamp + delta;
-    const newDte = moment(parsed).format("YYYY-MM-DD")
-    console.log('newDte :>> ', newDte);
-    return ` ('${newDte}', '${concepto}', '${nroCbte}', '${valor}', (SELECT orden as Ord FROM ${tableTMov} WHERE desc_extracto LIKE '${smConcepto}' LIMIT 1), ${credito}, '0', '0', ${idUsu}, '0', '${descripcion}') `
+
+    return ` ('${fecha}', '${concepto}', '${nroCbte}', '${valor}', (SELECT orden as Ord FROM ${tableTMov} WHERE desc_extracto LIKE '${smConcepto}' LIMIT 1), ${credito}, '0', '0', ${idUsu}, '0', '${descripcion}') `
 }
 
 const listExtractos = (desde, hasta, pagAct) => {
