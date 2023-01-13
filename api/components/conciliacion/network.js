@@ -38,8 +38,17 @@ const createExcel = (req, res, next) => {
         .catch(next)
 }
 
+const getDepTransf = (req, res, next) => {
+    Controller.getDepTransf(req.query.fromDate, req.query.toDate, req.query.type)
+        .then((list) => {
+            response.success(req, res, 200, list)
+        })
+        .catch(next)
+}
+
 //Routes
 router.get("/transf", secure(7), getTransf)
+router.get("/transfDep", secure(7), getDepTransf)
 router.get("/download/", secure(7), download)
 router.get("/excel/", secure(7), createExcel)
 router.patch("/:id", secure(7), updateCustom)

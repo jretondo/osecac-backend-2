@@ -79,10 +79,21 @@ module.exports = (injectedStore) => {
         return ""
     }
 
+    const getDepTransf = async (fromDate, toDate, type) => {
+        let typeStr = ""
+        if (type) {
+            typeStr = ` AND tipo = ${type}`
+        }
+
+        return await store.customQuery(`SELECT * FROM ${TABLA} WHERE fecha_dep >= '${fromDate}' AND fecha_dep <= '${toDate}' AND conciliado = '1' ${typeStr} `)
+    }
+
+
     return {
         getTransf,
         update,
         download,
-        createExcel
+        createExcel,
+        getDepTransf
     }
 }

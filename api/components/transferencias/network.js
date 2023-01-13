@@ -9,6 +9,8 @@ const config = require("../../../config")
 const getTransf = (req, res, next) => {
     Controller.getTransf(req.query.desde, req.query.hasta, req.query.pend, req.query.busqueda, req.query.importe, req.query.sinCos)
         .then((list) => {
+
+            console.log('req.query.pend :>> ', req.query.pend);
             response.success(req, res, 200, list)
         })
         .catch(next)
