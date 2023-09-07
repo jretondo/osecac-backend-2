@@ -88,12 +88,19 @@ module.exports = (injectedStore) => {
         return await store.customQuery(`SELECT * FROM ${TABLA} WHERE fecha_dep >= '${fromDate}' AND fecha_dep <= '${toDate}' AND conciliado = '1' ${typeStr} `)
     }
 
+    const getValores = async (fromDate, toDate) => {
+        const desdeStr = moment(fromDate, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const hastaStr = moment(toDate, "YYYY-MM-DD").format("YYYY-MM-DD")
+        const listaMovRaw = await store.customQuery(`SELECT * FROM ${TABLA} WHERE fecha >= '${desdeStr}' AND fecha <= '${hastaStr}' AND (id_tipo = 4 OR concepto like '% falla tecnica%') AND conciliado = 0;`)
+        return await functions.makeExcel2(listaMovRaw, moment(fromDate, "YYYY-MM-DD").format("YYYY-MM-DD"), moment(toDate, "YYYY-MM-DD").format("YYYY-MM-DD"))
+    }
 
     return {
         getTransf,
         update,
         download,
         createExcel,
-        getDepTransf
+        getDepTransf,
+        getValores
     }
 }

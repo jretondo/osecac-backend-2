@@ -135,10 +135,38 @@ const makeExcel = async (listamov, desde, hasta) => {
     })
 }
 
+const makeExcel2 = async (listamov, desde, hasta) => {
+    return new Promise((resolve, reject) => {
+        let json = []
+        listamov.map((item, key) => {
+            const fecha = moment(item.fecha, "DD/MM/YYYY").format("DD/MM/YYYY")
+            const cheque = item.nro_cbte
+            const importe = item.monto
+            const concepto = item.concepto
+            json.push({
+                Fecha: fecha,
+                Cheque_Nro: cheque,
+                Importe: importe,
+                concepto: concepto
+            })
+
+            if (key === (listamov.length - 1)) {
+                let workBook = XLSX.utils.book_new();
+                const workSheet = XLSX.utils.json_to_sheet(json);
+                XLSX.utils.book_append_sheet(workBook, workSheet, `Hoja1`);
+                let exportFileName = path.join("Archivos", "Valores-Excel", "Valores-" + desde + "-al-" + hasta + ".xls");
+                XLSX.writeFile(workBook, exportFileName);
+                resolve(path.join("Archivos", "Valores-Excel", "Valores-" + desde + "-al-" + hasta + ".xls"))
+            }
+        })
+    })
+}
+
 module.exports = {
     transformToDate,
     transformToMoney,
     listaMovExtracto,
     renderReport,
-    makeExcel
+    makeExcel,
+    makeExcel2
 }

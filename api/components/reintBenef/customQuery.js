@@ -9,7 +9,7 @@ const getList = (table, busqueda, tipo, cbu) => {
     if (cbu) {
         tieneCbu = ` AND cbu != ''`
     }
-    return ` SELECT * FROM ${table} WHERE (raz_soc LIKE '%${busqueda}%' OR localidad LIKE '%${busqueda}%' OR encargado LIKE '%${busqueda}%' OR email LIKE '%${busqueda}%') AND tipo_prov = '${tipo}' ${tieneCbu} ORDER BY localidad`
+    return ` SELECT * FROM ${table} WHERE (raz_soc LIKE '%${busqueda}%' OR localidad LIKE '%${busqueda}%' OR encargado LIKE '%${busqueda}%' OR email LIKE '%${busqueda}%') AND tipo_prov = '${tipo}' ${tieneCbu} ORDER BY raz_soc`
 }
 
 const getCantTotal = (table, busqueda, tipo) => {
