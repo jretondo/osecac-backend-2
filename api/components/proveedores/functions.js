@@ -43,7 +43,7 @@ const relleno = async (original, cantFila, espacio, derecha) => {
 }
 
 const numberToString = (number) => {
-    const number2 = number * 100
+    const number2 = Math.round((number * 100))
     return String(number2).replace(".", "")
 }
 

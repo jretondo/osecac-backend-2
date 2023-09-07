@@ -59,7 +59,8 @@ module.exports = (injectedStore) => {
                 const fila = await functions.newLine(item, cbuOrigen)
                 total = total + parseFloat(item.importe)
                 textIn = textIn + fila + "\r\n"
-                if (key === (body.length) - 1) {
+
+                if (key === (body.length - 1)) {
                     const ultFila = await functions.finalLine(key + 2, (Math.round(total * 100) / 100))
                     textIn = textIn + ultFila + "\r\n"
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
